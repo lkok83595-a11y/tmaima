@@ -2966,20 +2966,35 @@ function importBackup(input){
 }
 
 // ═══════════════════════════ INIT ═══════════════════════════════
-const dateInput = document.getElementById('dateInput');
-dateInput.value = currentDate;
-dateInput.addEventListener('change',()=>{currentDate=dateInput.value;renderDaily()});
-document.getElementById('txTime').value = nowTime();
-document.getElementById('invDate').value = todayStr();
-const dateStr = arDate(todayStr());
-document.getElementById('sidebarDate').textContent = dateStr;
-document.getElementById('rptFrom').value = todayStr();
-document.getElementById('rptTo').value   = todayStr();
-// init top products range: last 30 days
-const d30=new Date();d30.setDate(d30.getDate()-30);
-document.getElementById('topProdFrom').value=d30.toISOString().slice(0,10);
-document.getElementById('topProdTo').value=todayStr();
-addInvRow(true); // start with one empty row (data loads async)
+function initApp(){
+  const dateInput = document.getElementById('dateInput');
+  if(dateInput){
+    dateInput.value = currentDate;
+    dateInput.addEventListener('change',()=>{currentDate=dateInput.value;renderDaily()});
+  }
+  const txTime = document.getElementById('txTime');
+  if(txTime) txTime.value = nowTime();
+  const invDate = document.getElementById('invDate');
+  if(invDate) invDate.value = todayStr();
+  const sidebarDate = document.getElementById('sidebarDate');
+  if(sidebarDate) sidebarDate.textContent = arDate(todayStr());
+  const rptFrom = document.getElementById('rptFrom');
+  if(rptFrom) rptFrom.value = todayStr();
+  const rptTo = document.getElementById('rptTo');
+  if(rptTo) rptTo.value = todayStr();
+  // init top products range: last 30 days
+  const d30=new Date();d30.setDate(d30.getDate()-30);
+  const topProdFrom = document.getElementById('topProdFrom');
+  if(topProdFrom) topProdFrom.value=d30.toISOString().slice(0,10);
+  const topProdTo = document.getElementById('topProdTo');
+  if(topProdTo) topProdTo.value=todayStr();
+  addInvRow(true); // start with one empty row (data loads async)
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 // ═══════════════════════════ NAVIGATION ═════════════════════════
 const pageTitles = {
