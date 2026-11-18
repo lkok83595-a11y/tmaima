@@ -1092,8 +1092,8 @@ tbody tr:last-child td{border-bottom:none}
 .prm-sec-title{font-size:9px;font-weight:900;color:#94a3b8;letter-spacing:1.2px;text-transform:uppercase;padding:10px 0 8px;display:flex;align-items:center;gap:10px}
 .prm-sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#e2e8f0,transparent)}
 .prm-tbl{width:100%;border-collapse:collapse}
-.prm-tbl thead tr{background:linear-gradient(135deg,#0f172a,#1e293b)}
-.prm-tbl thead th{padding:8px 10px;font-size:9px;font-weight:800;color:rgba(255,255,255,.7);text-align:right;letter-spacing:.3px}
+.prm-tbl thead tr{background-color:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.prm-tbl thead th{padding:10px 10px;font-size:11px;font-weight:900;color:#ffffff !important;text-align:right;letter-spacing:.3px;background-color:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .prm-tbl thead th:last-child{text-align:left}
 .prm-tbl tbody tr:nth-child(odd){background:#fff}
 .prm-tbl tbody tr:nth-child(even){background:#f8fafc}
@@ -2138,10 +2138,12 @@ tbody tr:last-child td{border-bottom:none}
       <input type="date" id="invSearchTo" onchange="renderInvoiceList()">
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-      <button class="inv-filter-chip active" onclick="setInvFilter('all',this)">الكل</button>
-      <button class="inv-filter-chip c-paid" onclick="setInvFilter('paid',this)">✅ مدفوعة</button>
-      <button class="inv-filter-chip c-debt" onclick="setInvFilter('debt',this)">⏳ آجل</button>
-      <button class="inv-filter-chip c-part" onclick="setInvFilter('part',this)">💰 جزئي</button>
+      <button class="inv-filter-chip active"  onclick="setInvFilter('all',this)">الكل</button>
+      <button class="inv-filter-chip c-paid"  onclick="setInvFilter('paid',this)">✅ مدفوعة</button>
+      <button class="inv-filter-chip c-debt"  onclick="setInvFilter('debt',this)">⏳ آجل</button>
+      <button class="inv-filter-chip c-part"  onclick="setInvFilter('part',this)">💰 جزئي</button>
+      <button class="inv-filter-chip" style="color:#059669;border-color:#10b981" onclick="setInvFilter('confirmed',this)">📋 مؤكد</button>
+      <button class="inv-filter-chip" style="color:#4f46e5;border-color:#6366f1" onclick="setInvFilter('shipped',this)">🚚 مشحون</button>
     </div>
   </div>
 
@@ -2536,16 +2538,18 @@ tbody tr:last-child td{border-bottom:none}
         <div class="prm-sec-title">📦 بنود الفاتورة</div>
         <table class="prm-tbl">
           <thead>
-            <tr>
-              <th style="width:22px;text-align:center">#</th>
-              <th>المنتج</th>
-              <th style="width:52px;text-align:center">الكمية</th>
-              <th style="width:80px;text-align:center">سعر الوحدة</th>
-              <th style="width:85px">الإجمالي</th>
+            <tr style="background-color:#1e293b !important">
+              <th style="width:22px;text-align:center;background:#1e293b;color:#fff">#</th>
+              <th style="background:#1e293b;color:#fff">المنتج</th>
+              <th style="width:60px;text-align:center;background:#1e293b;color:#fff">الكمية</th>
+              <th style="width:90px;text-align:center;background:#1e293b;color:#fff">سعر الوحدة</th>
+              <th style="width:90px;background:#1e293b;color:#fff">الإجمالي</th>
             </tr>
           </thead>
           <tbody id="invPrintRows"></tbody>
         </table>
+        <!-- ملخص الدُسَت -->
+        <div id="prmDozSummary" style="display:none;margin:6px 0 2px;padding:7px 12px;background:linear-gradient(90deg,#eef2ff,#f5f3ff);border-radius:8px;border:1px solid #c7d2fe;font-size:11px;font-weight:900;color:#4338ca;text-align:left;letter-spacing:.3px"></div>
       </div>
       <!-- الإجمالي وحالة الدفع -->
       <div class="prm-bottom">
@@ -2565,7 +2569,7 @@ tbody tr:last-child td{border-bottom:none}
       <!-- QR + ملاحظات + توقيع -->
       <div class="prm-qrnotes" id="prmQrNotes">
         <div style="display:flex;align-items:center;gap:8px" id="prmQrBox">
-          <div class="prm-qr-sq">📲</div>
+          <div id="prmQrCanvas" style="width:52px;height:52px;border-radius:9px;overflow:hidden;background:#f1f5f9;border:2px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8"></div>
           <div class="prm-qr-txt">QR التحقق<br>امسح للتأكيد</div>
         </div>
         <div class="prm-bc-wrap" id="prmBcWrap">
@@ -2573,12 +2577,12 @@ tbody tr:last-child td{border-bottom:none}
           <div class="prm-bc-num" id="prmBcNum"></div>
         </div>
         <div class="prm-note-box" id="prmNoteBox">
-          <div class="prm-note-lbl">📝 ملاحظات</div>
-          <div class="prm-note-txt" id="prmNoteTxt">—</div>
+          <div class="prm-note-lbl" id="prmNoteLbl" style="display:none">📝 ملاحظات</div>
+          <div class="prm-note-txt" id="prmNoteTxt"></div>
         </div>
         <div class="prm-sig">
           <div class="prm-sig-line"></div>
-          <div class="prm-sig-lbl">توقيع المسؤول</div>
+          <div class="prm-sig-lbl" id="prmSigName">توقيع المسؤول</div>
         </div>
       </div>
       <!-- فوتر -->
@@ -2600,7 +2604,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="inv-print-actions">
       <button class="btn-close-print" onclick="closeInvPrint()">✕ إغلاق</button>
       <button class="btn-close-print" id="btnInvQr" onclick="showInvQr()" style="color:var(--blue);border-color:var(--blue)">📲 QR</button>
-      <button class="btn-do-print" onclick="window.print()">🖨️ طباعة / PDF</button>
+      <button class="btn-do-print" onclick="printInvoiceOnly()">🖨️ طباعة / PDF</button>
     </div>
   </div>
 </div>
@@ -2668,7 +2672,19 @@ tbody tr:last-child td{border-bottom:none}
           </div>
         </div>
         <div class="ff">
-          <label>أيقونة المتجر (Emoji)</label>
+          <label>لوجو المتجر (صورة)</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div id="st_logo_preview" onclick="document.getElementById('st_logo_input').click()" style="width:64px;height:64px;border-radius:12px;border:2px dashed var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .2s" title="اضغط لرفع صورة">🏪</div>
+            <div>
+              <input type="file" id="st_logo_input" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+              <button onclick="document.getElementById('st_logo_input').click()" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:block;margin-bottom:6px">📁 اختار صورة</button>
+              <button id="st_logo_clear_btn" onclick="clearLogo()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink-soft);display:none">🗑️ حذف اللوجو</button>
+              <div style="font-size:10px;color:var(--ink-faint);margin-top:4px">PNG أو JPG — مربعة الأفضل</div>
+            </div>
+          </div>
+        </div>
+        <div class="ff">
+          <label>أيقونة المتجر (Emoji) — تظهر لو مفيش لوجو</label>
           <input type="text" id="st_emoji" placeholder="🏪" maxlength="2" style="font-size:24px;text-align:center;width:70px">
         </div>
         <!-- معاينة اللون -->
@@ -2693,6 +2709,10 @@ tbody tr:last-child td{border-bottom:none}
         <div class="ff">
           <label>ملاحظة افتراضية على الفاتورة</label>
           <input type="text" id="st_inv_note" placeholder="شكراً لثقتك بنا">
+        </div>
+        <div class="ff">
+          <label>اسم المسؤول (يظهر تحت خط التوقيع)</label>
+          <input type="text" id="st_sig_name" placeholder="مثال: محمد أحمد — مدير المتجر">
         </div>
         <div class="ff">
           <label>سياسة الاسترجاع (تظهر في أسفل الفاتورة)</label>
@@ -2778,7 +2798,7 @@ tbody tr:last-child td{border-bottom:none}
           <div style="text-align:left">
             <div style="text-align:center;min-width:60px">
               <div style="width:60px;border-bottom:1px solid rgba(255,255,255,.3);margin:16px auto 4px"></div>
-              <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700">توقيع المسؤول</div>
+              <div id="prev_sig_lbl" style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700">توقيع المسؤول</div>
             </div>
           </div>
         </div>
@@ -3202,6 +3222,8 @@ async function load(){
       clientId:      inv.client_id      ?? inv.clientId      ?? null,
       cashierName:   inv.cashier_name   ?? inv.cashierName   ?? '',
       depositMethod: inv.deposit_method  ?? inv.depositMethod ?? '',
+      confirmed:     inv.confirmed        ?? false,
+      confirmedAt:   inv.confirmed_at    ?? inv.confirmedAt   ?? null,
       shipped:       inv.shipped         ?? false,
       shippedAt:     inv.shipped_at      ?? inv.shippedAt     ?? null,
       items: typeof inv.items==='string' ? JSON.parse(inv.items||'[]') : (inv.items||[]),
@@ -3214,6 +3236,77 @@ async function load(){
   }
   hideDbLoading();
 }
+
+// ══════════════ AUTO REFRESH — تحديث صامت كل 5 ثواني ══════════════
+let _arBusy = false; // منع التداخل لو الطلب لسه شغال
+
+async function silentRefresh(){
+  // مش بنعمل refresh لو المودال مفتوح (طباعة / تعديل)
+  const modalOpen = document.querySelector('.modal.open, #invPrintModal.open, #invEditModal.open');
+  if(modalOpen || _arBusy) return;
+  _arBusy = true;
+  try{
+    const [ent, prods, invs, clis] = await Promise.all([
+      supaFetch('entries?order=id.desc').catch(()=>null),
+      supaFetch('products?order=id.asc').catch(()=>null),
+      supaFetch('invoices?order=id.desc').catch(()=>null),
+      supaFetch('clients?order=id.asc').catch(()=>null),
+    ]);
+    if(ent)   entries  = ent.map(e=>({...e, desc: e.description ?? e.desc ?? ''}));
+    if(prods) products = prods.map(p=>({...p, sellPrice:p.sell_price??p.sellPrice??0, buyPrice:p.buy_price??p.buyPrice??0, qty:p.qty!=null?Number(p.qty):0}));
+    if(invs)  invoices = invs.map(inv=>({
+      ...inv,
+      grandTotal:    inv.grand_total    ?? inv.grandTotal    ?? 0,
+      payStatus:     inv.pay_status     ?? inv.payStatus     ?? 'paid',
+      paidAmount:    inv.paid_amount    ?? inv.paidAmount    ?? 0,
+      debtAmount:    inv.debt_amount    ?? inv.debtAmount    ?? 0,
+      clientPhone:   inv.client_phone   ?? inv.clientPhone   ?? '',
+      clientAddress: inv.client_address ?? inv.clientAddress ?? '',
+      clientId:      inv.client_id      ?? inv.clientId      ?? null,
+      cashierName:   inv.cashier_name   ?? inv.cashierName   ?? '',
+      depositMethod: inv.deposit_method ?? inv.depositMethod ?? '',
+      confirmed:     inv.confirmed      ?? false,
+      confirmedAt:   inv.confirmed_at   ?? inv.confirmedAt   ?? null,
+      shipped:       inv.shipped        ?? false,
+      shippedAt:     inv.shipped_at     ?? inv.shippedAt     ?? null,
+      items: typeof inv.items==='string' ? JSON.parse(inv.items||'[]') : (inv.items||[]),
+    }));
+    if(clis) clients = clis;
+
+    // تحديث الصفحة المفتوحة حالياً بس (بدون أي loading)
+    const pg = document.querySelector('.page.active')?.id;
+    if(pg==='pg-invoice')   renderInvoiceList();
+    if(pg==='pg-products')  renderProducts();
+    if(pg==='pg-clients')   renderClients?.();
+    if(pg==='pg-dashboard') renderDashboard?.();
+    if(pg==='pg-daily')     renderEntries?.();
+
+    // مؤشر صغير جداً في الكورنر
+    showSyncDot();
+  }catch(e){
+    // فشل صامت — مش بنزعج المستخدم
+    console.warn('silent refresh failed:', e);
+  }finally{
+    _arBusy = false;
+  }
+}
+
+// نقطة خضرا صغيرة تلمع ثانية واحدة بس
+function showSyncDot(){
+  let dot = document.getElementById('_syncDot');
+  if(!dot){
+    dot = document.createElement('div');
+    dot.id = '_syncDot';
+    dot.style.cssText = 'position:fixed;bottom:14px;left:14px;width:8px;height:8px;border-radius:50%;background:#10b981;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(dot);
+  }
+  dot.style.opacity = '1';
+  setTimeout(()=>{ dot.style.opacity='0'; }, 1000);
+}
+
+// ابدأ الـ auto-refresh بعد أول تحميل بـ 5 ثواني
+setTimeout(()=>{ setInterval(silentRefresh, 5000); }, 5000);
+// ══════════════ END AUTO REFRESH ══════════════
 
 // ── إضافة entry ──
 async function dbAddEntry(entry){
@@ -5951,7 +6044,9 @@ function renderInvoiceList(){
   if(q) list=list.filter(i=>(i.client||'').toLowerCase().includes(q)||(i.num||'').toLowerCase().includes(q));
   if(from) list=list.filter(i=>i.date>=from);
   if(to)   list=list.filter(i=>i.date<=to);
-  if(invFilter!=='all') list=list.filter(i=>i.payStatus===invFilter);
+  if(invFilter==='confirmed') list=list.filter(i=>i.confirmed&&!i.shipped);
+  else if(invFilter==='shipped') list=list.filter(i=>i.shipped);
+  else if(invFilter!=='all') list=list.filter(i=>i.payStatus===invFilter);
   document.getElementById('invCount').textContent=list.length+'/'+invoices.length;
   if(!list.length){
     el.innerHTML=`<div class="empty"><span class="eicon">🧾</span><p>${invoices.length?'لا توجد نتائج':'لا توجد فواتير بعد'}</p></div>`;
@@ -5967,8 +6062,28 @@ function renderInvoiceList(){
         <span style="color:#059669">✅ عربون: ${fmt(inv.paidAmount||0)} ج${inv.depositMethod?' ('+esc(inv.depositMethod)+')':''}</span>
         <span style="color:#dc2626">🚚 مع شركة الشحن: ${fmt(inv.debtAmount||0)} ج</span>
       </div>` : '';
+
+    // ── شريط حالة الطلب ──
+    const isConfirmed = !!inv.confirmed;
+    const isShipped   = !!inv.shipped;
+    const orderStatusBar = `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid ${isConfirmed?'#10b981':'#e2e8f0'};background:${isConfirmed?'#ecfdf5':'#f8fafc'};color:${isConfirmed?'#059669':'#94a3b8'}">
+          ${isConfirmed?'✅':'○'} تم التأكيد${isConfirmed&&inv.confirmedAt?' · '+arDate(inv.confirmedAt.slice(0,10)):''}
+        </div>
+        <div style="width:24px;height:1.5px;background:${isConfirmed?'#10b981':'#e2e8f0'};flex-shrink:0"></div>
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid ${isShipped?'#6366f1':'#e2e8f0'};background:${isShipped?'#eef2ff':'#f8fafc'};color:${isShipped?'#4f46e5':'#94a3b8'}">
+          ${isShipped?'🚚':'○'} تم الشحن${isShipped&&inv.shippedAt?' · '+arDate(inv.shippedAt.slice(0,10)):''}
+        </div>
+      </div>`;
+
+    // ── أزرار الحالة ──
+    const confirmBtn  = !isConfirmed ? `<button class="btn-inv-print" style="color:#059669;border-color:#10b981;background:#ecfdf5" onclick="markInvConfirmed(${inv.id})">✅ تأكيد الطلب</button>` : '';
+    const shipBtn     = isConfirmed && !isShipped ? `<button class="btn-inv-print" style="color:#4f46e5;border-color:#6366f1;background:#eef2ff" onclick="markInvShipped(${inv.id})">🚚 تم الشحن</button>` : '';
+    const unshipBtn   = isShipped ? `<button class="btn-inv-print" style="color:#94a3b8;border-color:#cbd5e1" onclick="unmarkInvShipped(${inv.id})">↩️ إلغاء شحن</button>` : '';
+
     return `
-    <div class="inv-card">
+    <div class="inv-card" style="${isShipped?'border-right:4px solid #6366f1':isConfirmed?'border-right:4px solid #10b981':''}">
       <div class="inv-card-top">
         <div>
           <div class="inv-num" style="display:flex;align-items:center;gap:8px">
@@ -5978,16 +6093,18 @@ function renderInvoiceList(){
           <div class="inv-client">${inv.client?'👤 '+esc(inv.client):'بدون عميل'}${inv.clientPhone?' &nbsp;<span style="font-size:12px;color:var(--ink-faint)">📞 '+esc(inv.clientPhone)+'</span>':''}</div>
           <div class="inv-date">📅 ${arDate(inv.date)}${inv.cashierName?' &nbsp;|&nbsp; 🧑‍💼 '+esc(inv.cashierName):''}${inv.clientAddress?' &nbsp;|&nbsp; 📍 '+esc(inv.clientAddress):''}${inv.notes?' &nbsp;|&nbsp; '+esc(inv.notes):''}</div>
           ${depositInfo}
+          ${orderStatusBar}
         </div>
         <div class="inv-total-badge">+${fmt(inv.grandTotal)} ج</div>
       </div>
       <div class="inv-items-preview">
         ${inv.items.map(i=>`<span class="inv-item-chip">${esc(i.prodName)} × ${i.qty}</span>`).join('')}
       </div>
-      <div class="inv-card-actions">
+      <div class="inv-card-actions" style="flex-wrap:wrap">
         <button class="btn-inv-print" onclick="printInvoice(${inv.id})">🖨️ عرض / طباعة</button>
+        ${confirmBtn}${shipBtn}${unshipBtn}
         <button class="btn-inv-print" style="color:var(--blue);border-color:var(--blue)" onclick="openInvEditModal(${inv.id})">✏️ تعديل</button>
-        ${inv.payStatus==='part'||inv.payStatus==='debt' ? `<button class="btn-inv-print" style="color:var(--green);border-color:var(--green)" onclick="markInvoicePaid(${inv.id})">✅ تسجيل دفع</button>` : ''}
+        ${inv.payStatus==='part'||inv.payStatus==='debt' ? `<button class="btn-inv-print" style="color:var(--green);border-color:var(--green)" onclick="markInvoicePaid(${inv.id})">💰 تسجيل دفع</button>` : ''}
         <button class="btn-inv-del" onclick="deleteInvoice(${inv.id})">🗑️ حذف</button>
       </div>
     </div>`;
@@ -6027,6 +6144,50 @@ async function deleteInvoice(id){
   }
 }
 
+// ── تأكيد الطلب ──
+async function markInvConfirmed(id){
+  const inv = invoices.find(x=>x.id===id);
+  if(!inv) return;
+  if(!confirm(`تأكيد الطلب رقم ${inv.num}؟\nده بيعني إن الطلب تم مراجعته وجاهز للشحن.`)) return;
+  const confirmedAt = new Date().toISOString();
+  try{
+    await supaFetch('invoices?id=eq.'+id,{method:'PATCH',body:{confirmed:true,confirmed_at:confirmedAt},prefer:'return=minimal'});
+    inv.confirmed   = true;
+    inv.confirmedAt = confirmedAt;
+    showToast('✅ تم تأكيد الطلب '+inv.num);
+    renderInvoiceList();
+  }catch(e){ showToast('⚠️ خطأ في تأكيد الطلب'); console.error(e); }
+}
+
+// ── تأكيد الشحن ──
+async function markInvShipped(id){
+  const inv = invoices.find(x=>x.id===id);
+  if(!inv) return;
+  if(!confirm(`تأكيد شحن الفاتورة ${inv.num}؟`)) return;
+  const shippedAt = new Date().toISOString();
+  try{
+    await supaFetch('invoices?id=eq.'+id,{method:'PATCH',body:{shipped:true,shipped_at:shippedAt},prefer:'return=minimal'});
+    inv.shipped   = true;
+    inv.shippedAt = shippedAt;
+    showToast('🚚 تم تأكيد الشحن — '+inv.num);
+    renderInvoiceList();
+  }catch(e){ showToast('⚠️ خطأ في تأكيد الشحن'); console.error(e); }
+}
+
+// ── إلغاء الشحن ──
+async function unmarkInvShipped(id){
+  const inv = invoices.find(x=>x.id===id);
+  if(!inv) return;
+  if(!confirm(`إلغاء الشحن من الفاتورة ${inv.num}؟`)) return;
+  try{
+    await supaFetch('invoices?id=eq.'+id,{method:'PATCH',body:{shipped:false,shipped_at:null},prefer:'return=minimal'});
+    inv.shipped   = false;
+    inv.shippedAt = null;
+    showToast('↩️ تم إلغاء الشحن — '+inv.num);
+    renderInvoiceList();
+  }catch(e){ showToast('⚠️ خطأ'); console.error(e); }
+}
+
 async function markInvoicePaid(id){
   const inv = invoices.find(x=>x.id===id);
   if(!inv) return;
@@ -6052,6 +6213,48 @@ async function markInvoicePaid(id){
 // ══════════════ SETTINGS — بيانات المتجر ══════════════
 const SK_SETTINGS = 'hisabat_settings';
 
+// ── لوجو المتجر ──
+function handleLogoUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ showToast('⚠️ الصورة أكبر من 2MB'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const dataUrl = e.target.result;
+    const s = getStoreSettings();
+    s.logoData = dataUrl;
+    localStorage.setItem(SK_SETTINGS, JSON.stringify(s));
+    applyLogoPreview(dataUrl);
+    updateSettingsPreview();
+    showToast('✅ تم حفظ اللوجو');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyLogoPreview(dataUrl){
+  const box = document.getElementById('st_logo_preview');
+  const clearBtn = document.getElementById('st_logo_clear_btn');
+  if(!box) return;
+  if(dataUrl){
+    box.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    if(clearBtn) clearBtn.style.display = '';
+  } else {
+    const s = getStoreSettings();
+    box.textContent = s.emoji || '🏪';
+    if(clearBtn) clearBtn.style.display = 'none';
+  }
+}
+
+function clearLogo(){
+  if(!confirm('هتحذف اللوجو؟')) return;
+  const s = getStoreSettings();
+  delete s.logoData;
+  localStorage.setItem(SK_SETTINGS, JSON.stringify(s));
+  applyLogoPreview(null);
+  updateSettingsPreview();
+  showToast('🗑️ تم حذف اللوجو');
+}
+
 function getStoreSettings(){
   try{ return JSON.parse(localStorage.getItem(SK_SETTINGS)||'{}'); }catch(e){ return {}; }
 }
@@ -6071,12 +6274,14 @@ function loadSettingsForm(){
   setVal('st_emoji',     s.emoji    || '🏪');
   setVal('st_inv_prefix',s.invPrefix|| 'INV');
   setVal('st_inv_note',  s.invNote  || '');
+  setVal('st_sig_name',  s.sigName  || '');
   setVal('st_return_policy', s.returnPolicy || '');
   const qr = document.getElementById('st_show_qr');
   const bc = document.getElementById('st_show_barcode');
   if(qr) qr.checked = !!s.showQr;
   if(bc) bc.checked = s.showBarcode !== false;
   applySettingsColor(s.color || '#1e3a5f');
+  applyLogoPreview(s.logoData || null);
   updateSettingsPreview();
 }
 
@@ -6130,7 +6335,11 @@ function updateSettingsPreview(){
   const grandBox = document.getElementById('prev_grand_box');
   if(grandBox) grandBox.style.background = grad;
   const emojiEl = document.getElementById('prev_emoji_box');
-  if(emojiEl) emojiEl.textContent = emoji;
+  if(emojiEl){
+    const s2 = getStoreSettings();
+    if(s2.logoData) emojiEl.innerHTML = `<img src="${s2.logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    else emojiEl.textContent = emoji;
+  }
   const nameArEl = document.getElementById('prev_name_ar');
   if(nameArEl) nameArEl.textContent = nameAr;
   const nameEnEl = document.getElementById('prev_name_en');
@@ -6147,6 +6356,10 @@ function updateSettingsPreview(){
   if(prevPolicy) prevPolicy.innerHTML = policy ? policy.split('\n').map(l=>`<div>• ${l}</div>`).join('') : '';
   const prevFootNote = document.getElementById('prev_footer_note');
   if(prevFootNote) prevFootNote.textContent = invNote;
+  // اسم المسؤول في المعاينة
+  const sigName = g('st_sig_name');
+  const prevSigLbl = document.getElementById('prev_sig_lbl');
+  if(prevSigLbl) prevSigLbl.textContent = sigName || 'توقيع المسؤول';
   const prevFootContacts = document.getElementById('prev_footer_contacts');
   if(prevFootContacts){
     let lines='';
@@ -6172,6 +6385,7 @@ function saveStoreSettings(){
     emoji:        g('st_emoji') || '🏪',
     invPrefix:    g('st_inv_prefix') || 'INV',
     invNote:      g('st_inv_note'),
+    sigName:      g('st_sig_name'),
     returnPolicy: g('st_return_policy'),
     showQr:       gc('st_show_qr'),
     showBarcode:  gc('st_show_barcode'),
@@ -6211,7 +6425,15 @@ function printInvoice(id){
   const hd = document.getElementById('prmHd');
   if(hd) hd.style.background = grad;
   document.getElementById('prmRainbow').style.background = rainbow;
-  document.getElementById('prmCoLogo').textContent = s.emoji || '🏪';
+  // لوجو — صورة أو إيموجي
+  const logoBox = document.getElementById('prmCoLogo');
+  if(logoBox){
+    if(s.logoData){
+      logoBox.innerHTML = `<img src="${s.logoData}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    } else {
+      logoBox.textContent = s.emoji || '🏪';
+    }
+  }
   document.getElementById('prmCoName').textContent  = s.nameAr || 'متجرك';
   document.getElementById('prmCoNameEn').textContent = (s.nameEn||'').toUpperCase();
   let contacts='';
@@ -6244,9 +6466,9 @@ function printInvoice(id){
   // البنود
   document.getElementById('invPrintRows').innerHTML = inv.items.map((item,i)=>`
     <tr>
-      <td style="color:#cbd5e1;font-size:10px;text-align:center">${i+1}</td>
+      <td style="color:#94a3b8;font-size:10px;text-align:center">${i+1}</td>
       <td><span style="font-weight:800;color:#0f172a">${esc(item.prodName)}</span></td>
-      <td style="text-align:center;font-weight:900">${item.qty}</td>
+      <td style="text-align:center;font-weight:900;color:#0f172a">${item.qty||0}</td>
       <td style="text-align:center;color:#475569">${fmt(item.price)} ج</td>
       <td>${fmt(item.total)} ج</td>
     </tr>`).join('');
@@ -6255,6 +6477,15 @@ function printInvoice(id){
   const sub = inv.items.reduce((s,it)=>s+it.total,0);
   document.getElementById('prmSubTotal').textContent = fmt(sub)+' ج';
   document.getElementById('invPrintTotal').textContent = fmt(inv.grandTotal||sub);
+
+  // ملخص الدُسَت — جمع الكميات مباشرة
+  const totalDoz = inv.items.reduce((s,it)=>s+(parseFloat(it.qty)||0), 0);
+  const dozDisplay = Number.isInteger(totalDoz) ? totalDoz : +totalDoz.toFixed(2);
+  const dozSummaryEl = document.getElementById('prmDozSummary');
+  if(dozSummaryEl){
+    dozSummaryEl.innerHTML = `إجمالي الدُسَت: <span style="font-size:20px;font-weight:900;color:#4f46e5;margin:0 4px">${dozDisplay}</span> دسته`;
+    dozSummaryEl.style.display = '';
+  }
 
   // بطاقات الدفع
   let payCards='';
@@ -6269,15 +6500,34 @@ function printInvoice(id){
   }
   document.getElementById('prmPayCards').innerHTML = payCards;
 
-  // ملاحظات
-  document.getElementById('prmNoteTxt').textContent = inv.notes || (s.invNote||'شكراً لثقتك بنا');
+  // ملاحظات — اظهر العنوان بس لو فيه نص
+  const noteText = inv.notes || s.invNote || '';
+  document.getElementById('prmNoteTxt').textContent = noteText;
+  const noteLbl = document.getElementById('prmNoteLbl');
+  if(noteLbl) noteLbl.style.display = noteText ? '' : 'none';
 
-  // barcode + QR visibility
+  // توقيع المسؤول
+  const sigEl = document.getElementById('prmSigName');
+  if(sigEl) sigEl.textContent = s.sigName || 'توقيع المسؤول';
+
+  // barcode
   const bcWrap = document.getElementById('prmBcWrap');
   const qrBox  = document.getElementById('prmQrBox');
   if(bcWrap) bcWrap.style.display = s.showBarcode!==false ? '' : 'none';
-  if(qrBox)  qrBox.style.display  = s.showQr ? '' : 'none';
   if(s.showBarcode!==false){ buildBarcode('prmBcSvg'); document.getElementById('prmBcNum').textContent=`${prefix}-${String(inv.num||id).padStart(4,'0')} · ${inv.date||''}`; }
+
+  // QR — بناء QR حقيقي
+  if(qrBox) qrBox.style.display = s.showQr ? '' : 'none';
+  if(s.showQr){
+    const qrCanvas = document.getElementById('prmQrCanvas');
+    if(qrCanvas){
+      qrCanvas.innerHTML = '';
+      const qrData = `${prefix}-${String(inv.num||id).padStart(4,'0')}|${inv.date||''}|${fmt(inv.grandTotal||0)}`;
+      try{
+        new QRCode(qrCanvas,{text:qrData,width:48,height:48,colorDark:'#0f172a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+      }catch(e){ qrCanvas.textContent='QR'; }
+    }
+  }
 
   // فوتر — سياسة الاسترجاع
   const policyEl = document.getElementById('prmPolicy');
@@ -6301,6 +6551,58 @@ function printInvoice(id){
   document.getElementById('invPrintModal').classList.add('open');
 }
 function closeInvPrint(){document.getElementById('invPrintModal').classList.remove('open')}
+
+function printInvoiceOnly(){
+  const sheet = document.querySelector('.prm-sheet');
+  if(!sheet){ window.print(); return; }
+
+  // جمع كل الـ CSS من الصفحة
+  const styles = [...document.styleSheets].map(ss=>{
+    try{
+      return [...ss.cssRules].map(r=>r.cssText).join('\n');
+    }catch(e){ return ''; }
+  }).join('\n');
+
+  const html = `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Cairo',sans-serif;background:#fff;direction:rtl}
+    ${styles}
+    @media print{
+      body{margin:0}
+      .inv-print-actions{display:none!important}
+      .print-only-btn{display:none!important}
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width:720px;margin:0 auto">
+    ${sheet.outerHTML}
+  </div>
+  <div class="print-only-btn" style="text-align:center;padding:16px">
+    <button onclick="window.print();window.close()" style="background:#1e3a5f;color:#fff;border:none;border-radius:8px;padding:12px 32px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;cursor:pointer">🖨️ طباعة / PDF</button>
+    <button onclick="window.close()" style="background:none;border:1.5px solid #cbd5e1;border-radius:8px;padding:12px 24px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-right:10px;color:#64748b">✕ إغلاق</button>
+  </div>
+  <script>
+    // طباعة تلقائية بعد تحميل الخطوط
+    window.onload = function(){
+      setTimeout(function(){ window.print(); }, 800);
+    };
+  <\/script>
+</body>
+</html>`;
+
+  const win = window.open('','_blank','width=800,height=900');
+  if(!win){ showToast('⚠️ السماح بالـ Popup مطلوب — اسمح للمتصفح'); return; }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
 document.getElementById('invPrintModal').addEventListener('click',function(e){if(e.target===this)closeInvPrint()});
 
 // ═══════════════════════════ CLIENTS ════════════════════════════
@@ -7484,7 +7786,7 @@ function pwaInstall(){
 
 // ══ ربط live-preview للإعدادات ══
 (function(){
-  const liveIds = ['st_name_ar','st_name_en','st_phone1','st_phone2','st_address','st_website','st_email','st_emoji','st_inv_note','st_return_policy'];
+  const liveIds = ['st_name_ar','st_name_en','st_phone1','st_phone2','st_address','st_website','st_email','st_emoji','st_inv_note','st_sig_name','st_return_policy'];
   liveIds.forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.addEventListener('input', updateSettingsPreview);
