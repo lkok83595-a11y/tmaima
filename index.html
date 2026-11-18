@@ -1036,11 +1036,13 @@ tbody tr:last-child td{border-bottom:none}
 .pay-pill{border-radius:20px;padding:6px 16px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--ink-soft);transition:all .15s}
 .pay-pill-paid.sel{background:var(--green);color:#fff;border-color:var(--green)}
 .pay-pill-part.sel{background:var(--gold);color:#fff;border-color:var(--gold)}
+.pay-pill-ship.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
 .pay-pill-debt.sel{background:var(--red);color:#fff;border-color:var(--red)}
 /* ── شارة الدين على الفاتورة ── */
 .inv-debt-badge{font-size:11px;font-weight:800;padding:2px 10px;border-radius:10px}
 .inv-debt-badge.paid{background:var(--green-bg);color:var(--green)}
 .inv-debt-badge.part{background:var(--gold-bg);color:var(--gold)}
+.inv-debt-badge.ship{background:var(--blue-bg);color:var(--blue)}
 .inv-debt-badge.debt{background:var(--red-bg);color:var(--red)}
 
 /* Product modal */
@@ -2078,53 +2080,92 @@ tbody tr:last-child td{border-bottom:none}
       <div style="font-size:12px;font-weight:800;color:var(--ink-faint);margin-bottom:10px">💳 طريقة الدفع</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <button class="pay-pill pay-pill-paid sel" id="ppPaid" onclick="setPayStatus('paid')">💵 كاش كامل</button>
-        <button class="pay-pill pay-pill-part"     id="ppPart" onclick="setPayStatus('part')">📦 عربون + باقي مع شركة الشحن</button>
+        <button class="pay-pill pay-pill-part"     id="ppPart" onclick="setPayStatus('part')">📲 عربون + مع الشحن</button>
+        <button class="pay-pill pay-pill-ship"     id="ppShip" onclick="setPayStatus('ship')">📦 مع شركة الشحن</button>
         <button class="pay-pill pay-pill-debt"     id="ppDebt" onclick="setPayStatus('debt')">⏳ آجل</button>
       </div>
 
-      <!-- صف العربون — بيظهر لما تختار "عربون + باقي مع شركة الشحن" -->
+      <!-- صف العربون — بيظهر لما تختار "عربون + مع الشحن" -->
       <div id="partPayRow" style="display:none;flex-direction:column;gap:10px">
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-          <div class="ff" style="flex:1;min-width:140px">
-            <label style="font-size:11px;color:var(--ink-faint);font-weight:700">💰 العربون المدفوع (ج)</label>
-            <input type="number" id="invPaidAmount" placeholder="0.00" step="0.01" min="0"
-              oninput="updateRestLabel()"
-              style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;
-                     font-family:'Cairo',sans-serif;font-size:14px;width:100%;outline:none">
-          </div>
-          <div class="ff" style="flex:1;min-width:140px">
+          <!-- العربون موبايل -->
+          <div class="ff" style="flex:1;min-width:130px">
             <label style="font-size:11px;color:var(--ink-faint);font-weight:700">📲 طريقة العربون</label>
-            <select id="invDepositMethod"
+            <select id="invDepositMethod" onchange="updateRestLabel()"
               style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;
                      font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
                      color:var(--ink);background:#fff;width:100%;outline:none;cursor:pointer">
               <option value="">— اختر —</option>
               <option value="vodafone">📱 فودافون كاش</option>
               <option value="instapay">💳 إنستاباي</option>
-              <option value="cash">💵 كاش</option>
               <option value="bank">🏦 تحويل بنكي</option>
               <option value="other">🔹 أخرى</option>
             </select>
           </div>
+          <!-- مبلغ العربون موبايل -->
+          <div class="ff" style="flex:1;min-width:110px">
+            <label style="font-size:11px;color:var(--ink-faint);font-weight:700">💰 مبلغ العربون (ج)</label>
+            <input type="number" id="invPaidAmount" placeholder="0.00" step="0.01" min="0"
+              oninput="updateRestLabel()"
+              style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;
+                     font-family:'Cairo',sans-serif;font-size:14px;width:100%;outline:none">
+          </div>
+          <!-- كاش إضافي مع العربون -->
+          <div class="ff" style="flex:1;min-width:110px">
+            <label style="font-size:11px;color:var(--ink-faint);font-weight:700">💵 كاش مع العربون (ج)</label>
+            <input type="number" id="invDepositCash" placeholder="0.00" step="0.01" min="0"
+              oninput="updateRestLabel()"
+              style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;
+                     font-family:'Cairo',sans-serif;font-size:14px;width:100%;outline:none">
+          </div>
         </div>
         <!-- ملخص العربون والباقي -->
         <div id="invRestLabel" style="display:none;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
             <div style="font-size:12px;font-weight:700;color:#92400e">
               ✅ عربون: <span id="invDepositDisplay" style="font-size:15px;font-weight:900;color:#059669">0 ج</span>
             </div>
+            <div style="font-size:12px;font-weight:700;color:#92400e" id="invDepositCashLabel" style="display:none">
+              💵 كاش: <span id="invDepositCashDisplay" style="font-size:15px;font-weight:900;color:#059669">0 ج</span>
+            </div>
             <div style="font-size:12px;font-weight:700;color:#92400e">
-              🚚 باقي مع شركة الشحن: <span id="invRestDisplay" style="font-size:15px;font-weight:900;color:#dc2626">0 ج</span>
+              🚚 مع شركة الشحن: <span id="invRestDisplay" style="font-size:15px;font-weight:900;color:#dc2626">0 ج</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- رسالة "مع شركة الشحن" كامل — بيظهر لما تختار ship -->
+      <div id="shipOnlyRow" style="display:none;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;border-radius:10px;padding:12px 14px">
+        <div style="font-size:13px;font-weight:800;color:#1e40af">
+          📦 المبلغ الكامل سيُحصَّل كاش مع شركة الشحن
+        </div>
+        <div style="font-size:11px;font-weight:600;color:#3b82f6;margin-top:4px">
+          لا يوجد عربون — المندوب سيستلم كامل المبلغ
         </div>
       </div>
     </div>
 
     <div class="inv-footer">
-      <div class="inv-total-box">
-        <div class="inv-total-label">إجمالي الفاتورة</div>
-        <div class="inv-total-val" id="invGrandTotal">0.00 ج</div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:200px">
+        <!-- المجموع الفرعي -->
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-soft);font-weight:700">
+          <span>المجموع الفرعي</span>
+          <span id="invSubTotal">0.00 ج</span>
+        </div>
+        <!-- خانة الخصم -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#f59e0b;font-weight:800;white-space:nowrap">🏷️ خصم</span>
+          <input type="number" id="invDiscount" min="0" step="0.5" placeholder="0.00"
+            oninput="updateInvTotal()"
+            style="width:90px;border:1.5px solid #fde68a;border-radius:8px;padding:5px 8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;color:#d97706;background:#fffbeb;text-align:center;outline:none">
+          <span style="font-size:11px;color:var(--ink-faint);font-weight:700">ج</span>
+        </div>
+        <!-- الإجمالي النهائي -->
+        <div class="inv-total-box" style="margin:0">
+          <div class="inv-total-label">الإجمالي</div>
+          <div class="inv-total-val" id="invGrandTotal">0.00 ج</div>
+        </div>
       </div>
       <button class="btn-save-inv" onclick="saveInvoice()"><span>✦</span> حفظ الفاتورة</button>
     </div>
@@ -2139,9 +2180,10 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
       <button class="inv-filter-chip active"  onclick="setInvFilter('all',this)">الكل</button>
-      <button class="inv-filter-chip c-paid"  onclick="setInvFilter('paid',this)">✅ مدفوعة</button>
+      <button class="inv-filter-chip c-paid"  onclick="setInvFilter('paid',this)">✅ كاش كامل</button>
       <button class="inv-filter-chip c-debt"  onclick="setInvFilter('debt',this)">⏳ آجل</button>
-      <button class="inv-filter-chip c-part"  onclick="setInvFilter('part',this)">💰 جزئي</button>
+      <button class="inv-filter-chip c-part"  onclick="setInvFilter('part',this)">📲 عربون</button>
+      <button class="inv-filter-chip" style="color:#3b82f6;border-color:#93c5fd" onclick="setInvFilter('ship',this)">📦 مع الشحن</button>
       <button class="inv-filter-chip" style="color:#059669;border-color:#10b981" onclick="setInvFilter('confirmed',this)">📋 مؤكد</button>
       <button class="inv-filter-chip" style="color:#4f46e5;border-color:#6366f1" onclick="setInvFilter('shipped',this)">🚚 مشحون</button>
     </div>
@@ -2559,7 +2601,7 @@ tbody tr:last-child td{border-bottom:none}
         </div>
         <div class="prm-tot-col">
           <div class="prm-tot-row"><span class="trl">المجموع الفرعي</span><span class="trv" id="prmSubTotal">—</span></div>
-          <div class="prm-tot-row"><span class="trl">الضريبة (0%)</span><span class="trv">0.00 ج</span></div>
+          <div class="prm-tot-row disc" id="prmDiscRow" style="display:none"><span class="trl">🏷️ خصم</span><span class="trv" id="prmDiscVal">—</span></div>
           <div class="prm-tot-grand">
             <span class="tgl">💰 الإجمالي النهائي</span>
             <span class="tgv"><small>ج.م</small><span id="invPrintTotal">—</span></span>
@@ -3214,7 +3256,14 @@ async function load(){
     invoices = (invs||[]).map(inv=>({
       ...inv,
       grandTotal:    inv.grand_total    ?? inv.grandTotal    ?? 0,
-      payStatus:     inv.pay_status     ?? inv.payStatus     ?? 'paid',
+      // لو part مع depositMethod = 'مع شركة الشحن' و paidAmount=0 → ship
+      payStatus: (()=>{
+        const ps = inv.pay_status ?? inv.payStatus ?? 'paid';
+        const dm = inv.deposit_method ?? inv.depositMethod ?? '';
+        const pa = inv.paid_amount ?? inv.paidAmount ?? 0;
+        if(ps==='part' && pa===0 && dm==='مع شركة الشحن') return 'ship';
+        return ps;
+      })(),
       paidAmount:    inv.paid_amount    ?? inv.paidAmount    ?? 0,
       debtAmount:    inv.debt_amount    ?? inv.debtAmount    ?? 0,
       clientPhone:   inv.client_phone   ?? inv.clientPhone   ?? '',
@@ -3237,6 +3286,73 @@ async function load(){
   hideDbLoading();
 }
 
+// ══════════════ RESERVATION SYSTEM — حجز مؤقت ══════════════
+
+// session فريد لكل تبويب/مستخدم
+const RES_SESSION = 'res_' + Math.random().toString(36).slice(2,10) + '_' + Date.now();
+
+// خريطة محلية: prodId → qty محجوزة في هذه الجلسة
+const _localReservations = {}; // {prodId: qty}
+
+// حجز كمية لمنتج — يستدعى عند اختيار منتج أو تغيير الكمية
+async function reserveQty(prodId, qty){
+  if(!prodId || qty <= 0) return;
+  try{
+    // امسح الحجز القديم لنفس المنتج في هذه الجلسة أولاً
+    await supaFetch(`reservations?session_id=eq.${RES_SESSION}&product_id=eq.${prodId}`,
+      {method:'DELETE', prefer:'return=minimal'}).catch(()=>{});
+    // احجز الكمية الجديدة
+    await supaFetch('reservations', {
+      method:'POST',
+      body:{ session_id: RES_SESSION, product_id: prodId, qty: qty }
+    });
+    _localReservations[prodId] = qty;
+  }catch(e){ console.warn('reserve failed:', e); }
+}
+
+// إلغاء حجز منتج واحد (عند حذف بند)
+async function releaseQty(prodId){
+  if(!prodId) return;
+  try{
+    await supaFetch(`reservations?session_id=eq.${RES_SESSION}&product_id=eq.${prodId}`,
+      {method:'DELETE', prefer:'return=minimal'});
+    delete _localReservations[prodId];
+  }catch(e){ console.warn('release failed:', e); }
+}
+
+// إلغاء كل حجوزات هذه الجلسة (عند إغلاق/reset الفورم)
+async function releaseAllReservations(){
+  if(!Object.keys(_localReservations).length) return;
+  try{
+    await supaFetch(`reservations?session_id=eq.${RES_SESSION}`,
+      {method:'DELETE', prefer:'return=minimal'});
+    Object.keys(_localReservations).forEach(k=>delete _localReservations[k]);
+  }catch(e){ console.warn('releaseAll failed:', e); }
+}
+
+// حساب الكمية المتاحة فعلاً = المخزون - مجموع الحجوزات من الآخرين
+async function getAvailableQty(prodId){
+  const prod = products.find(p=>p.id===prodId);
+  if(!prod) return 0;
+  try{
+    // جلب كل الحجوزات على هذا المنتج من غير جلستنا
+    const rows = await supaFetch(
+      `reservations?product_id=eq.${prodId}&session_id=neq.${RES_SESSION}&select=qty`
+    ).catch(()=>[]);
+    const reservedByOthers = (rows||[]).reduce((s,r)=>s+(parseFloat(r.qty)||0), 0);
+    return Math.max(0, prod.qty - reservedByOthers);
+  }catch(e){ return prod.qty; }
+}
+
+// تنظيف حجوزات الجلسة لو أغلق التبويب
+window.addEventListener('beforeunload', ()=>{
+  if(!Object.keys(_localReservations).length) return;
+  // sendBeacon لأنه يشتغل حتى بعد إغلاق التبويب
+  const url = `${SUPA_URL}/rest/v1/reservations?session_id=eq.${RES_SESSION}`;
+  navigator.sendBeacon && navigator.sendBeacon(url+'&_method=DELETE',
+    new Blob([JSON.stringify({})], {type:'application/json'}));
+});
+
 // ══════════════ AUTO REFRESH — تحديث صامت كل 5 ثواني ══════════════
 let _arBusy = false; // منع التداخل لو الطلب لسه شغال
 
@@ -3257,7 +3373,14 @@ async function silentRefresh(){
     if(invs)  invoices = invs.map(inv=>({
       ...inv,
       grandTotal:    inv.grand_total    ?? inv.grandTotal    ?? 0,
-      payStatus:     inv.pay_status     ?? inv.payStatus     ?? 'paid',
+      discount:      inv.discount       ?? 0,
+      payStatus: (()=>{
+        const ps = inv.pay_status ?? inv.payStatus ?? 'paid';
+        const dm = inv.deposit_method ?? inv.depositMethod ?? '';
+        const pa = inv.paid_amount ?? inv.paidAmount ?? 0;
+        if(ps==='part' && pa===0 && dm==='مع شركة الشحن') return 'ship';
+        return ps;
+      })(),
       paidAmount:    inv.paid_amount    ?? inv.paidAmount    ?? 0,
       debtAmount:    inv.debt_amount    ?? inv.debtAmount    ?? 0,
       clientPhone:   inv.client_phone   ?? inv.clientPhone   ?? '',
@@ -3472,6 +3595,16 @@ let invFilter = 'all';
 let invEditPayStatus = 'paid';
 let currentPrintInvId = null;
 function showPage(id, btn){
+  // لو كنا في صفحة الفاتورة وبنروح صفحة تانية — ارفع كل الحجوزات
+  const wasOnInvoice = document.getElementById('pg-invoice')?.classList.contains('active');
+  if(wasOnInvoice && id !== 'pg-invoice'){
+    releaseAllReservations();
+    // امسح الـ invRows عشان الحجوزات متتجددش لو رجع
+    document.getElementById('invRows').innerHTML='';
+    invRowCount=0;
+    addInvRow(true);
+    updateInvTotal();
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -3772,6 +3905,7 @@ function setInvFilter(f, btn){
 
 // ═══════════════════════════ INVOICE EDIT ════════════════════
 function openInvEditModal(id){
+  if(currentUser?.role !== 'admin'){ showToast('⛔ صلاحية الأدمن فقط'); return; }
   const inv = invoices.find(x=>x.id===id);
   if(!inv) return;
   document.getElementById('invEditId').value = id;
@@ -5764,29 +5898,45 @@ function updateBtStatusUI(connected){
 // ═══════════════════════════ PAYMENT STATUS ══════════════════════
 function setPayStatus(s){
   invPayStatus = s;
-  ['paid','part','debt'].forEach(x=>{
-    document.getElementById('pp'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('sel', x===s);
+  ['paid','part','ship','debt'].forEach(x=>{
+    const btn = document.getElementById('pp'+x.charAt(0).toUpperCase()+x.slice(1));
+    if(btn) btn.classList.toggle('sel', x===s);
   });
-  document.getElementById('partPayRow').style.display = s==='part' ? 'flex' : 'none';
-  if(s==='part') document.getElementById('invPaidAmount').focus();
+  document.getElementById('partPayRow').style.display   = s==='part' ? 'flex' : 'none';
+  document.getElementById('shipOnlyRow').style.display  = s==='ship' ? 'block' : 'none';
+  if(s==='part'){
+    document.getElementById('invDepositMethod').focus();
+  }
   updateRestLabel();
 }
 
 function updateRestLabel(){
   if(invPayStatus!=='part') return;
-  const totalEl = document.getElementById('invGrandTotal');
+  const totalEl  = document.getElementById('invGrandTotal');
   const totalStr = totalEl ? totalEl.textContent.replace(/[^\d.]/g,'') : '0';
-  const total = parseFloat(totalStr)||0;
-  const paid  = parseFloat(document.getElementById('invPaidAmount').value)||0;
-  const rest  = Math.max(0, total - paid);
-  const box   = document.getElementById('invRestLabel');
-  const depEl = document.getElementById('invDepositDisplay');
-  const remEl = document.getElementById('invRestDisplay');
+  const total    = parseFloat(totalStr)||0;
+  const mobile   = parseFloat(document.getElementById('invPaidAmount').value)||0;
+  const cashDep  = parseFloat(document.getElementById('invDepositCash').value)||0;
+  const totalPaid= mobile + cashDep;
+  const rest     = Math.max(0, total - totalPaid);
+  const box      = document.getElementById('invRestLabel');
+  const depEl    = document.getElementById('invDepositDisplay');
+  const remEl    = document.getElementById('invRestDisplay');
+  const cashLbl  = document.getElementById('invDepositCashLabel');
+  const cashDisp = document.getElementById('invDepositCashDisplay');
   if(box){
-    if(paid > 0){
+    if(totalPaid > 0){
       box.style.display = 'block';
-      if(depEl) depEl.textContent = fmt(paid) + ' ج';
+      if(depEl) depEl.textContent = fmt(mobile) + ' ج';
       if(remEl) remEl.textContent = fmt(rest) + ' ج';
+      if(cashLbl && cashDisp){
+        if(cashDep > 0){
+          cashLbl.style.display='inline';
+          cashDisp.textContent = fmt(cashDep) + ' ج';
+        } else {
+          cashLbl.style.display='none';
+        }
+      }
     } else {
       box.style.display = 'none';
     }
@@ -5821,7 +5971,7 @@ function addInvRow(silent){
   updateInvTotal();
 }
 
-function searchProdInRow(rowId, q){
+async function searchProdInRow(rowId, q){
   const dd=document.getElementById('dd_'+rowId);
   if(!dd) return;
   const hits = q.trim()
@@ -5835,9 +5985,29 @@ function searchProdInRow(rowId, q){
     dd.classList.add('show');
     return;
   }
+  // جلب الحجوزات من الآخرين لكل منتج في النتايج دفعة واحدة
+  const prodIds = hits.map(p=>p.id).join(',');
+  let reservedMap = {};
+  try{
+    if(prodIds){
+      const rows = await supaFetch(
+        `reservations?product_id=in.(${prodIds})&session_id=neq.${RES_SESSION}&select=product_id,qty`
+      ).catch(()=>[]);
+      (rows||[]).forEach(r=>{
+        reservedMap[r.product_id] = (reservedMap[r.product_id]||0) + parseFloat(r.qty||0);
+      });
+    }
+  }catch(e){}
+
   dd.innerHTML=hits.map(p=>{
-    const qtyClass=p.qty===0?'zero':p.qty<=5?'low':'ok';
-    return `<div class="prod-dd-item${p.qty===0?' zero':''}" onclick="${p.qty===0?'showToast(\'⚠️ المنتج نفد من المخزون\')':'pickProdInRow(\''+rowId+'\','+p.id+')'}">
+    const reserved = reservedMap[p.id]||0;
+    const available = Math.max(0, p.qty - reserved);
+    const qtyClass = available===0?'zero':available<=3?'low':'ok';
+    const qtyLabel = reserved>0
+      ? `${available} متاح (${reserved} محجوز)`
+      : `${available} متاح`;
+    const isZero = available <= 0;
+    return `<div class="prod-dd-item${isZero?' zero':''}" onclick="${isZero?'showToast(\'⚠️ المنتج محجوز أو نفد\')':'pickProdInRow(\''+rowId+'\','+p.id+')'}">
       <div>
         <div style="display:flex;align-items:center;gap:6px">
           <span class="prod-dd-name">${esc(p.name)}</span>
@@ -5845,32 +6015,56 @@ function searchProdInRow(rowId, q){
         </div>
         <div class="prod-dd-meta">سعر البيع: ${fmt(p.sellPrice)} ج${p.buyPrice?'  |  شراء: '+fmt(p.buyPrice)+' ج':''}</div>
       </div>
-      <span class="prod-dd-qty ${qtyClass}">${p.qty} وحدة</span>
+      <span class="prod-dd-qty ${qtyClass}">${qtyLabel}</span>
     </div>`;
   }).join('');
   dd.classList.add('show');
 }
 
-function pickProdInRow(rowId, prodId){
+async function pickProdInRow(rowId, prodId){
   const p=products.find(x=>x.id===prodId);
   if(!p) return;
   const row=document.getElementById(rowId);
   if(!row) return;
-  row.dataset.prodId=prodId;
+
+  // لو كان في الصف منتج قديم — ارفع حجزه الأول
+  const oldProdId = parseInt(row.dataset.prodId)||0;
+  if(oldProdId && oldProdId !== prodId) await releaseQty(oldProdId);
+
+  // فحص الكمية المتاحة فعلاً (بعد حجوزات الآخرين)
+  const available = await getAvailableQty(prodId);
+  if(available <= 0){
+    showToast(`⚠️ "${p.name}" محجوز بالكامل من شاشة تانية`);
+    return;
+  }
+
+  row.dataset.prodId = prodId;
+  row.dataset.availableQty = available;
   const inp=row.querySelector('.prod-search-inp');
   inp.value=(p.code?'['+p.code+'] ':'')+p.name;
   inp.classList.add('selected');
-  // set price
   const inputs=row.querySelectorAll('input[type="number"]');
   if(inputs[1]&&!inputs[1].value) inputs[1].value=p.sellPrice;
+  // اضبط الـ max على الكمية المتاحة
+  if(inputs[0]){ inputs[0].max = available; inputs[0].select(); }
   document.getElementById('dd_'+rowId).classList.remove('show');
+
+  // حجز مؤقت بالكمية الحالية
+  const qty = parseFloat(inputs[0]?.value)||1;
+  await reserveQty(prodId, Math.min(qty, available));
+
+  // أظهر الكمية المتاحة بجانب المنتج
+  showAvailableBadge(rowId, available);
   updateInvRowTotal(rowId);
-  // focus qty
-  if(inputs[0]) inputs[0].select();
 }
 
 function removeInvRow(id){
-  const el=document.getElementById(id);if(el)el.remove();
+  const el=document.getElementById(id);
+  if(el){
+    const prodId=parseInt(el.dataset.prodId)||0;
+    if(prodId) releaseQty(prodId);
+    el.remove();
+  }
   updateInvTotal();
 }
 
@@ -5882,20 +6076,69 @@ function updateInvRowTotal(rowId){
   const totalEl=row.querySelector('.inv-item-total');
   const qty=parseFloat(qtyInp?.value)||0;
   const price=parseFloat(priceInp?.value)||0;
+
+  // تحقق من الكمية المتاحة وأظهر تحذير لو تجاوزها
+  const prodId = parseInt(row.dataset.prodId)||0;
+  const available = parseFloat(row.dataset.availableQty)||Infinity;
+  if(prodId && qty > available){
+    qtyInp.style.borderColor='#ef4444';
+    qtyInp.title=`الكمية المتاحة: ${available}`;
+    showToast(`⚠️ الكمية المتاحة من هذا المنتج: ${available} بس`);
+  } else {
+    qtyInp.style.borderColor='';
+    qtyInp.title='';
+  }
+
   totalEl.textContent=fmt(qty*price)+' ج';
   updateInvTotal();
+
+  // تحديث الحجز في الخلفية
+  if(prodId && qty > 0){
+    reserveQty(prodId, Math.min(qty, available));
+  }
 }
 
 function updateInvTotal(){
   const rows=document.querySelectorAll('#invRows .inv-item-row');
-  let grand=0;
+  let sub=0;
   rows.forEach(row=>{
     const inputs=row.querySelectorAll('input[type="number"]');
     const qty=parseFloat(inputs[0]?.value)||0;
     const price=parseFloat(inputs[1]?.value)||0;
-    grand+=qty*price;
+    sub+=qty*price;
   });
+  const discount = parseFloat(document.getElementById('invDiscount')?.value)||0;
+  const grand = Math.max(0, sub - discount);
+  const subEl = document.getElementById('invSubTotal');
+  if(subEl) subEl.textContent = fmt(sub)+' ج';
   document.getElementById('invGrandTotal').textContent=fmt(grand)+' ج';
+}
+
+// Badge يظهر الكمية المتاحة بجانب اسم المنتج في الصف
+function showAvailableBadge(rowId, available){
+  const row = document.getElementById(rowId);
+  if(!row) return;
+  let badge = row.querySelector('.avail-badge');
+  if(!badge){
+    badge = document.createElement('span');
+    badge.className = 'avail-badge';
+    badge.style.cssText = 'font-size:10px;font-weight:800;padding:2px 7px;border-radius:12px;margin-right:6px;flex-shrink:0';
+    const wrap = row.querySelector('.prod-search-wrap');
+    if(wrap) wrap.appendChild(badge);
+  }
+  if(available <= 0){
+    badge.textContent = '⚠️ نفد';
+    badge.style.background = '#fef2f2';
+    badge.style.color = '#ef4444';
+  } else if(available <= 3){
+    badge.textContent = `⚡ ${available} متاح`;
+    badge.style.background = '#fffbeb';
+    badge.style.color = '#d97706';
+  } else {
+    badge.textContent = `✅ ${available} متاح`;
+    badge.style.background = '#ecfdf5';
+    badge.style.color = '#059669';
+  }
 }
 
 // Close product dropdowns when clicking outside
@@ -5937,15 +6180,42 @@ async function saveInvoice(){
   if(!items.length){showToast('⚠️ أضف منتج واحد على الأقل');return}
   if(!valid) return;
 
-  const grandTotal=items.reduce((a,i)=>a+i.total,0);
+  const subTotal   = items.reduce((a,i)=>a+i.total,0);
+  const discount   = Math.max(0, parseFloat(document.getElementById('invDiscount')?.value)||0);
+  const grandTotal = Math.max(0, subTotal - discount);
   const clientId  = parseInt(document.getElementById('invClientId').value)||null;
   const payStatus = invPayStatus;
-  const paidAmount = payStatus==='paid' ? grandTotal
-                   : payStatus==='debt' ? 0
-                   : Math.min(parseFloat(document.getElementById('invPaidAmount').value)||0, grandTotal);
-  const debtAmount = grandTotal - paidAmount;
-  const depositMethodRaw = payStatus==='part' ? (document.getElementById('invDepositMethod')?.value||'') : '';
-  const depositMethodLabel = {vodafone:'فودافون كاش', instapay:'إنستاباي', cash:'كاش', bank:'تحويل بنكي', other:'أخرى'}[depositMethodRaw] || depositMethodRaw;
+  // حساب المبالغ حسب نوع الدفع
+  // ملحوظة: ship بيتحول لـ 'part' في الـ DB مع paidAmount=0 ومفيش عربون
+  let paidAmount = 0;
+  let depositMethodLabel = '';
+  let dbPayStatus = payStatus; // القيمة اللي بتتبعت للـ DB
+  if(payStatus==='paid'){
+    paidAmount = grandTotal;
+  } else if(payStatus==='ship'){
+    // بدون عربون — كل المبلغ مع شركة الشحن
+    paidAmount = 0;
+    depositMethodLabel = 'مع شركة الشحن';
+    dbPayStatus = 'part'; // الـ DB بيقبل بس paid/part/debt
+  } else if(payStatus==='part'){
+    const mobile  = parseFloat(document.getElementById('invPaidAmount').value)||0;
+    const cashDep = parseFloat(document.getElementById('invDepositCash').value)||0;
+    paidAmount = Math.min(mobile + cashDep, grandTotal);
+    const depositMethodRaw = document.getElementById('invDepositMethod')?.value||'';
+    const methodLabel = {vodafone:'فودافون كاش', instapay:'إنستاباي', bank:'تحويل بنكي', other:'أخرى'}[depositMethodRaw] || depositMethodRaw;
+    if(mobile > 0 && cashDep > 0){
+      depositMethodLabel = methodLabel + ' + كاش ' + fmt(cashDep) + ' ج';
+    } else if(mobile > 0){
+      depositMethodLabel = methodLabel;
+    } else if(cashDep > 0){
+      depositMethodLabel = 'كاش';
+    }
+  } else {
+    // debt
+    paidAmount = 0;
+    dbPayStatus = 'debt';
+  }
+  const debtAmount = Math.max(0, grandTotal - paidAmount);
 
   // ── Idempotency Key فريد لهذه العملية (يُولَّد مرة واحدة ويُحفظ) ──
   // يضمن: لو انقطع الإنترنت وأُعيدت المحاولة → نفس الفاتورة بدون تكرار
@@ -5969,8 +6239,10 @@ async function saveInvoice(){
         p_client_address:  clientAddress,
         p_notes:           notes,
         p_items:           JSON.stringify(items),
+        p_sub_total:       subTotal,
+        p_discount:        discount,
         p_grand_total:     grandTotal,
-        p_pay_status:      payStatus,
+        p_pay_status:      dbPayStatus,
         p_paid_amount:     paidAmount,
         p_debt_amount:     debtAmount,
         p_deposit_method:  depositMethodLabel,
@@ -5986,9 +6258,12 @@ async function saveInvoice(){
       ...savedInv,
       items:         typeof savedInv.items==='string' ? JSON.parse(savedInv.items) : (savedInv.items||items),
       grandTotal:    savedInv.grand_total    ?? grandTotal,
-      payStatus:     savedInv.pay_status     ?? payStatus,
+      discount:      savedInv.discount       ?? discount,
+      // لو كان ship بيرجع من الـ DB كـ part — نرجعه ship في الذاكرة
+      payStatus:     payStatus === 'ship' ? 'ship' : (savedInv.pay_status ?? payStatus),
       paidAmount:    savedInv.paid_amount    ?? paidAmount,
       debtAmount:    savedInv.debt_amount    ?? debtAmount,
+      depositMethod: depositMethodLabel,
       clientPhone:   savedInv.client_phone   ?? clientPhone,
       clientAddress: savedInv.client_address ?? clientAddress,
       clientId:      savedInv.client_id      ?? clientId,
@@ -6004,13 +6279,24 @@ async function saveInvoice(){
 
     // ── رسالة نجاح وإعادة ضبط الفورم ──
     showToast(`✅ تم حفظ الفاتورة ${inv.num||savedInv.num||''}`);
+    // إلغاء كل الحجوزات بعد الحفظ — المخزون اتخصم رسمياً
+    await releaseAllReservations();
     document.getElementById('invRows').innerHTML='';
     invRowCount=0; clearInvClient();
     document.getElementById('invNotes').value='';
     document.getElementById('invDate').value=todayStr();
     document.getElementById('invGrandTotal').textContent='0.00 ج';
+    const discEl = document.getElementById('invDiscount');
+    if(discEl) discEl.value='';
+    const subEl = document.getElementById('invSubTotal');
+    if(subEl) subEl.textContent='0.00 ج';
     document.getElementById('invPaidAmount').value='';
+    const depCashEl = document.getElementById('invDepositCash');
+    if(depCashEl) depCashEl.value='';
+    const depMethodEl = document.getElementById('invDepositMethod');
+    if(depMethodEl) depMethodEl.value='';
     document.getElementById('invRestLabel').style.display='none';
+    document.getElementById('shipOnlyRow').style.display='none';
     setPayStatus('paid'); addInvRow(true);
     updateInvHeroNum();
     renderInvoiceList();
@@ -6044,8 +6330,17 @@ function renderInvoiceList(){
   if(q) list=list.filter(i=>(i.client||'').toLowerCase().includes(q)||(i.num||'').toLowerCase().includes(q));
   if(from) list=list.filter(i=>i.date>=from);
   if(to)   list=list.filter(i=>i.date<=to);
+  // الكاشير يشوف بس فواتيره هو
+  const isAdmin = currentUser?.role === 'admin';
+  if(!isAdmin && currentUser){
+    list = list.filter(i =>
+      (i.cashierName || '') === currentUser.name
+    );
+  }
+
   if(invFilter==='confirmed') list=list.filter(i=>i.confirmed&&!i.shipped);
   else if(invFilter==='shipped') list=list.filter(i=>i.shipped);
+  else if(invFilter==='ship') list=list.filter(i=>i.payStatus==='ship');
   else if(invFilter!=='all') list=list.filter(i=>i.payStatus===invFilter);
   document.getElementById('invCount').textContent=list.length+'/'+invoices.length;
   if(!list.length){
@@ -6054,13 +6349,18 @@ function renderInvoiceList(){
   }
   el.innerHTML=list.map(inv=>{
     const payLabel = inv.payStatus==='debt' ? '⏳ آجل'
-                   : inv.payStatus==='part' ? `📦 عربون + مع شركة الشحن`
+                   : inv.payStatus==='part' ? `📲 عربون + مع الشحن`
+                   : inv.payStatus==='ship' ? `📦 مع شركة الشحن`
                    : '💵 كاش كامل';
-    const payClass = inv.payStatus==='debt'?'debt': inv.payStatus==='part'?'part':'paid';
+    const payClass = inv.payStatus==='debt'?'debt': inv.payStatus==='ship'?'ship': inv.payStatus==='part'?'part':'paid';
     const depositInfo = inv.payStatus==='part' ? `
       <div style="display:flex;gap:12px;flex-wrap:wrap;background:#fef9ec;border:1px solid #f59e0b;border-radius:8px;padding:8px 12px;margin-top:6px;font-size:12px;font-weight:800">
         <span style="color:#059669">✅ عربون: ${fmt(inv.paidAmount||0)} ج${inv.depositMethod?' ('+esc(inv.depositMethod)+')':''}</span>
         <span style="color:#dc2626">🚚 مع شركة الشحن: ${fmt(inv.debtAmount||0)} ج</span>
+      </div>`
+    : inv.payStatus==='ship' ? `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:8px 12px;margin-top:6px;font-size:12px;font-weight:800">
+        <span style="color:#1d4ed8">📦 المبلغ الكامل مع شركة الشحن: ${fmt(inv.grandTotal||0)} ج كاش</span>
       </div>` : '';
 
     // ── شريط حالة الطلب ──
@@ -6103,15 +6403,16 @@ function renderInvoiceList(){
       <div class="inv-card-actions" style="flex-wrap:wrap">
         <button class="btn-inv-print" onclick="printInvoice(${inv.id})">🖨️ عرض / طباعة</button>
         ${confirmBtn}${shipBtn}${unshipBtn}
-        <button class="btn-inv-print" style="color:var(--blue);border-color:var(--blue)" onclick="openInvEditModal(${inv.id})">✏️ تعديل</button>
+        ${isAdmin ? `<button class="btn-inv-print" style="color:var(--blue);border-color:var(--blue)" onclick="openInvEditModal(${inv.id})">✏️ تعديل</button>` : ''}
         ${inv.payStatus==='part'||inv.payStatus==='debt' ? `<button class="btn-inv-print" style="color:var(--green);border-color:var(--green)" onclick="markInvoicePaid(${inv.id})">💰 تسجيل دفع</button>` : ''}
-        <button class="btn-inv-del" onclick="deleteInvoice(${inv.id})">🗑️ حذف</button>
+        ${isAdmin ? `<button class="btn-inv-del" onclick="deleteInvoice(${inv.id})">🗑️ حذف</button>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
 async function deleteInvoice(id){
+  if(currentUser?.role !== 'admin'){ showToast('⛔ صلاحية الأدمن فقط'); return; }
   const inv = invoices.find(i=>i.id===id);
   if(!inv){ showToast('⚠️ الفاتورة غير موجودة'); return; }
   if(!confirm(`هتحذف الفاتورة ${inv.num||''}؟\nالكميات هترجع للمخزون تلقائياً.`)) return;
@@ -6473,10 +6774,21 @@ function printInvoice(id){
       <td>${fmt(item.total)} ج</td>
     </tr>`).join('');
 
-  // إجمالي
+  // إجمالي + خصم
   const sub = inv.items.reduce((s,it)=>s+it.total,0);
+  const disc = parseFloat(inv.discount)||0;
   document.getElementById('prmSubTotal').textContent = fmt(sub)+' ج';
   document.getElementById('invPrintTotal').textContent = fmt(inv.grandTotal||sub);
+  const discRow = document.getElementById('prmDiscRow');
+  const discVal  = document.getElementById('prmDiscVal');
+  if(discRow && discVal){
+    if(disc > 0){
+      discVal.textContent = '- '+fmt(disc)+' ج';
+      discRow.style.display = '';
+    } else {
+      discRow.style.display = 'none';
+    }
+  }
 
   // ملخص الدُسَت — جمع الكميات مباشرة
   const totalDoz = inv.items.reduce((s,it)=>s+(parseFloat(it.qty)||0), 0);
@@ -7439,8 +7751,8 @@ function renderDashboard(){
 
   // كاش = paid كامل
   const cashInvs  = todayInvs.filter(inv=>inv.payStatus==='paid');
-  // شحن = عربون + شركة شحن
-  const shipInvs  = todayInvs.filter(inv=>inv.payStatus==='part');
+  // شحن = عربون أو بدون عربون مع شركة شحن
+  const shipInvs  = todayInvs.filter(inv=>inv.payStatus==='part'||inv.payStatus==='ship');
   // اتشحن = shipped===true
   const shippedInvs = shipInvs.filter(inv=>inv.shipped);
   // لسه = شحن بس ما اتأكدش
@@ -7507,9 +7819,9 @@ function renderDashOrdersList(todayInvs){
 
   let filtered = all;
   if(dashFilter==='cash')    filtered = all.filter(i=>i.payStatus==='paid');
-  if(dashFilter==='ship')    filtered = all.filter(i=>i.payStatus==='part');
+  if(dashFilter==='ship')    filtered = all.filter(i=>i.payStatus==='part'||i.payStatus==='ship');
   if(dashFilter==='shipped') filtered = all.filter(i=>i.shipped);
-  if(dashFilter==='pending') filtered = all.filter(i=>i.payStatus==='part'&&!i.shipped);
+  if(dashFilter==='pending') filtered = all.filter(i=>(i.payStatus==='part'||i.payStatus==='ship')&&!i.shipped);
 
   if(!filtered.length){
     wrap.innerHTML='<div style="font-size:12px;color:var(--ink-faint);text-align:center;padding:16px">لا توجد أوردرات</div>';
@@ -7517,9 +7829,14 @@ function renderDashOrdersList(todayInvs){
   }
 
   wrap.innerHTML = filtered.map(inv=>{
-    const isShip = inv.payStatus==='part';
+    const isShip = inv.payStatus==='part'||inv.payStatus==='ship';
     const isShipped = inv.shipped;
     const cardClass = isShipped?'shipped': isShip?'pending':'';
+    const depositTag = inv.payStatus==='ship'
+      ? `<span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800">📦 بدون عربون</span>`
+      : inv.payStatus==='part' && inv.paidAmount>0
+        ? `<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800">📲 عربون ${fmt(inv.paidAmount||0)} ج</span>`
+        : '';
     const statusBadge = isShipped
       ? `<span style="background:#d1fae5;color:#059669;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">✅ اتشحن</span>`
       : isShip
@@ -7541,9 +7858,12 @@ function renderDashOrdersList(todayInvs){
           ${inv.client?'👤 '+esc(inv.client):''}
           ${inv.cashierName?' &nbsp;|&nbsp; 🧑‍💼 '+esc(inv.cashierName):''}
         </div>
-        ${isShip?`<div style="font-size:12px;font-weight:700">
-          ✅ عربون: <span style="color:#059669">${fmt(inv.paidAmount||0)} ج</span>
+        ${isShip && inv.payStatus==='part' && inv.paidAmount>0 ?`<div style="font-size:12px;font-weight:700">
+          ✅ عربون: <span style="color:#059669">${fmt(inv.paidAmount||0)} ج</span>${inv.depositMethod?' ('+esc(inv.depositMethod)+')':''}
           &nbsp;|&nbsp; 🚚 شركة الشحن: <span style="color:#dc2626">${fmt(inv.debtAmount||0)} ج</span>
+        </div>`:''}
+        ${isShip && inv.payStatus==='ship'?`<div style="font-size:12px;font-weight:700;color:#1d4ed8">
+          📦 كامل المبلغ كاش مع المندوب: <span style="color:#1d4ed8">${fmt(inv.grandTotal||0)} ج</span>
         </div>`:''}
         ${confirmBtn?`<div style="margin-top:4px">${confirmBtn}</div>`:''}
       </div>`;
