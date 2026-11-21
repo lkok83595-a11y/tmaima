@@ -3196,11 +3196,8 @@ const _supaClient = supabase.createClient(SUPA_URL, SUPA_KEY, {
   }
 });
 
-// Returns the current auth JWT (or null if not signed in)
-async function _getToken(){
-  const { data: { session } } = await _supaClient.auth.getSession();
-  return session?.access_token || null;
-}
+// Returns null — auth is now handled via public.users table
+async function _getToken(){ return null; }
 
 // REST helper — always sends the user's JWT, never the anon key as Bearer
 async function supaFetch(path, opts={}){
@@ -4391,16 +4388,10 @@ async function createFirstAdmin(){
   btn.disabled = true; btn.textContent = '⏳ جاري الإنشاء...';
 
   try{
-    // 1. Sign up with Supabase Auth (email derived from username)
-    const email = username + '@hisabat.local';
-    const { data: signUpData, error: signUpErr } =
-      await _supaClient.auth.signUp({ email, password: pin });
-    if(signUpErr) throw signUpErr;
-
-    // 2. Call server-side RPC — it enforces "no admin yet" atomically
-    const { error: rpcErr } = await _supaClient.rpc('create_first_admin_profile',
-      { p_name: name, p_username: username });
-    if(rpcErr) throw rpcErr;
+    const { error } = await _supaClient
+      .from('users')
+      .insert({ name, username, pin, role: 'admin' });
+    if(error) throw error;
 
     document.getElementById('firstRunScreen').style.display = 'none';
     document.getElementById('lockScreen').style.display = 'flex';
@@ -4644,8 +4635,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
     applyRoleUI();
   } else {
     await checkFirstRun();
-    const adminExists = await hasAdminAccount();
-    if(adminExists) document.getElementById('loginUser').focus();
+    document.getElementById('loginUser').focus();
   }
 });
 
