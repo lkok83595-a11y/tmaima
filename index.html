@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>حسابات يومية</title>
+<title>حسابات يومية — v33</title>
 <meta name="theme-color" content="#1a1a2e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1519,6 +1519,7 @@ tbody tr:last-child td{border-bottom:none}
   #reportEmpty{display:none!important}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -2937,8 +2938,8 @@ tbody tr:last-child td{border-bottom:none}
     </div>
 
     <div style="text-align:right;margin-bottom:20px">
-      <label style="font-size:12px;font-weight:800;color:#64748b">الرقم السري (PIN)</label>
-      <input id="loginPin" type="password" placeholder="••••" maxlength="8"
+      <label style="font-size:12px;font-weight:800;color:#64748b">كلمة المرور</label>
+      <input id="loginPin" type="password" placeholder="••••" maxlength="128"
         onkeydown="if(event.key==='Enter')tryUnlock()"
         style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
                font-family:'Cairo',sans-serif;font-size:18px;letter-spacing:4px;
@@ -2986,8 +2987,8 @@ tbody tr:last-child td{border-bottom:none}
     </div>
 
     <div style="text-align:right;margin-bottom:10px">
-      <label style="font-size:12px;font-weight:800;color:#64748b">الرقم السري (PIN) — 4 إلى 8 أرقام</label>
-      <input id="frPin" type="password" placeholder="••••" maxlength="8"
+      <label style="font-size:12px;font-weight:800;color:#64748b">كلمة المرور — 4 إلى 8 أرقام</label>
+      <input id="frPin" type="password" placeholder="••••" maxlength="128"
         style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
                font-family:'Cairo',sans-serif;font-size:18px;letter-spacing:4px;
                margin-top:4px;outline:none;text-align:center"
@@ -2996,7 +2997,7 @@ tbody tr:last-child td{border-bottom:none}
 
     <div style="text-align:right;margin-bottom:20px">
       <label style="font-size:12px;font-weight:800;color:#64748b">تأكيد الرقم السري</label>
-      <input id="frPin2" type="password" placeholder="••••" maxlength="8"
+      <input id="frPin2" type="password" placeholder="••••" maxlength="128"
         onkeydown="if(event.key==='Enter')createFirstAdmin()"
         style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
                font-family:'Cairo',sans-serif;font-size:18px;letter-spacing:4px;
@@ -3047,8 +3048,8 @@ tbody tr:last-child td{border-bottom:none}
                    font-family:'Cairo',sans-serif;font-size:13px;outline:none">
         </div>
         <div>
-          <div style="font-size:10px;font-weight:800;color:#94a3b8;margin-bottom:4px">الرقم السري (PIN)</div>
-          <input id="newUserPin" type="text" placeholder="4-8 أرقام" maxlength="8" inputmode="numeric"
+          <div style="font-size:10px;font-weight:800;color:#94a3b8;margin-bottom:4px">كلمة المرور</div>
+          <input id="newUserPin" autocomplete="new-password" type="text" placeholder="4-8 أرقام" maxlength="8" inputmode="numeric"
             style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;
                    font-family:'Cairo',sans-serif;font-size:13px;outline:none">
         </div>
@@ -3179,20 +3180,40 @@ const PW_KEY='hisabat_pw';const DEFAULT_PW='1234';
 let dashPeriod = 'week';
 
 // ════════════════════════════════════════════════════
-//  SUPABASE CONFIG
+//  SUPABASE CONFIG  — v33 (secure)
 // ════════════════════════════════════════════════════
-const SUPA_URL = 'https://rlfwqedyeazqksrboxsc.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZndxZWR5ZWF6cWtzcmJveHNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2ODEyMzAsImV4cCI6MjExMDI1NzIzMH0.AnqZ0BreeNJZdUkVvqDy5hUszNhD5F1Viz_aAEX5rao';
+const SUPA_URL  = 'https://rlfwqedyeazqksrboxsc.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZndxZWR5ZWF6cWtzcmJveHNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2ODEyMzAsImV4cCI6MjExMDI1NzIzMH0.AnqZ0BreeNJZdUkVvqDy5hUszNhD5F1Viz_aAEX5rao';
+// Edge Function base URL — update after `supabase functions deploy admin-users`
+const EDGE_URL  = SUPA_URL + '/functions/v1/admin-users';
 
+// Supabase JS client — handles JWT, auto-refresh, session persistence
+const _supaClient = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession:   true,
+    detectSessionInUrl: false,
+  }
+});
+
+// Returns the current auth JWT (or null if not signed in)
+async function _getToken(){
+  const { data: { session } } = await _supaClient.auth.getSession();
+  return session?.access_token || null;
+}
+
+// REST helper — always sends the user's JWT, never the anon key as Bearer
 async function supaFetch(path, opts={}){
+  const token = await _getToken();
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': token ? ('Bearer ' + token) : ('Bearer ' + SUPA_KEY),
+    'Content-Type': 'application/json',
+    'Prefer': opts.prefer || 'return=representation',
+    ...(opts.headers||{})
+  };
   const res = await fetch(SUPA_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-      ...(opts.headers||{})
-    },
+    headers,
     method: opts.method || 'GET',
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
@@ -3202,6 +3223,24 @@ async function supaFetch(path, opts={}){
   }
   const text = await res.text();
   return text ? JSON.parse(text) : [];
+}
+
+// Edge Function helper — calls admin-users Edge Function with JWT
+async function edgeFetch(action, body=null){
+  const token = await _getToken();
+  if(!token) throw new Error('غير مسجل الدخول');
+  const res = await fetch(EDGE_URL + '/' + action, {
+    method: body ? 'POST' : 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'apikey': SUPA_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || 'خطأ في الخادم');
+  return data;
 }
 
 // ── Safe localStorage wrapper (للـ session فقط) ──
@@ -4288,58 +4327,53 @@ document.getElementById('editModal').addEventListener('click',function(e){if(e.t
 
 // ═══════════════════════════ USERS SYSTEM ═══════════════════════════
 const USERS_KEY = 'hisabat_users';
-const SESSION_KEY = 'hisabat_session';
+// ═══════════════════════════════════════════════════════
+//  AUTH v33 — Supabase Auth (secure, server-side)
+// ═══════════════════════════════════════════════════════
 
-// الصلاحيات لكل دور
+// الصلاحيات لكل دور (للـ UI فقط — الإنفاذ الفعلي في RLS)
 const ROLE_PERMS = {
   admin:   ['dashboard','daily','products','invoices','clients','reports','analytics','search','settings','users','catalog'],
   cashier: ['invoices','catalog'],
   store:   ['products'],
 };
-
 const ROLE_LABEL = { admin:'أدمن', cashier:'كاشير', store:'مخزن' };
 const ROLE_COLOR = { admin:'#1e3a5f', cashier:'#059669', store:'#d97706' };
 
-// ── Users من Supabase ──
-let _usersCache = null;
+let currentUser = null;   // { id, user_id, name, username, role, is_active }
 
-async function getUsers(){
-  if(_usersCache) return _usersCache;
-  try{
-    const rows = await supaFetch('users?order=id.asc');
-    _usersCache = Array.isArray(rows) ? rows : [];
-  }catch(e){ _usersCache = []; }
-  return _usersCache;
+// ── Rate-limiting (5 attempts → 15-min lockout, stored in sessionStorage) ──
+const _RL_KEY   = 'hl_rl';
+const _RL_MAX   = 5;
+const _RL_WAIT  = 15 * 60 * 1000; // 15 min in ms
+
+function _rlState(){
+  try{ return JSON.parse(sessionStorage.getItem(_RL_KEY)) || {count:0,until:0}; }
+  catch{ return {count:0,until:0}; }
+}
+function _rlSave(s){ try{ sessionStorage.setItem(_RL_KEY, JSON.stringify(s)); }catch{} }
+function _rlIsLocked(){
+  const s = _rlState();
+  if(s.count >= _RL_MAX && Date.now() < s.until) return Math.ceil((s.until - Date.now())/60000);
+  if(Date.now() >= s.until && s.count >= _RL_MAX) _rlSave({count:0,until:0}); // reset after wait
+  return false;
+}
+function _rlFail(){
+  const s = _rlState();
+  s.count++;
+  if(s.count >= _RL_MAX) s.until = Date.now() + _RL_WAIT;
+  _rlSave(s);
+}
+function _rlReset(){ _rlSave({count:0,until:0}); }
+
+// ── First-run: does any admin exist? ─────────────────────────────────────
+async function hasAdminAccount(){
+  const { data, error } = await _supaClient.rpc('has_admin_account');
+  if(error) throw error;
+  return !!data;
 }
 
-async function saveUser(u){
-  _usersCache = null;
-  const result = await supaFetch('users', { method:'POST', body: u });
-  console.log('saveUser raw result:', result);
-  if(!result || (Array.isArray(result) && result.length === 0)){
-    throw new Error('لم يتم الحفظ — تأكد إن جدول users موجود في Supabase');
-  }
-  return Array.isArray(result) ? result[0] : result;
-}
-
-async function updateUser(id, data){
-  _usersCache = null;
-  await supaFetch('users?id=eq.'+id, { method:'PATCH', body: data, prefer:'return=minimal' });
-}
-
-async function deleteUser(id){
-  _usersCache = null;
-  await supaFetch('users?id=eq.'+id, { method:'DELETE', prefer:'return=minimal' });
-}
-
-async function hasAdmin(){
-  const users = await getUsers();
-  return users.some(u => u.role === 'admin');
-}
-
-let currentUser = null;
-
-// إنشاء حساب الأدمن — أول مرة
+// ── First-run: create first admin ────────────────────────────────────────
 async function createFirstAdmin(){
   const name     = document.getElementById('frName').value.trim();
   const username = document.getElementById('frUsername').value.trim().toLowerCase();
@@ -4348,168 +4382,165 @@ async function createFirstAdmin(){
   const errEl    = document.getElementById('frErr');
   errEl.textContent = '';
 
-  if(!name)                          { errEl.textContent='⚠️ اكتب الاسم'; return; }
-  if(!username)                      { errEl.textContent='⚠️ اكتب اسم المستخدم'; return; }
-  if(!/^\d{4,8}$/.test(pin))        { errEl.textContent='⚠️ الـ PIN لازم 4-8 أرقام'; return; }
-  if(pin !== pin2)                   { errEl.textContent='⚠️ الرقمان غير متطابقين'; return; }
+  if(!name)         { errEl.textContent='⚠️ اكتب الاسم'; return; }
+  if(!username)     { errEl.textContent='⚠️ اكتب اسم المستخدم'; return; }
+  if(pin.length < 4){ errEl.textContent='⚠️ كلمة المرور لازم 4 أحرف على الأقل'; return; }
+  if(pin !== pin2)  { errEl.textContent='⚠️ كلمتا المرور غير متطابقتين'; return; }
 
   const btn = document.querySelector('#firstRunScreen button');
-  btn.disabled = true;
-  btn.textContent = '⏳ جاري الحفظ...';
-  errEl.textContent = '';
+  btn.disabled = true; btn.textContent = '⏳ جاري الإنشاء...';
+
   try{
-    const result = await saveUser({ name, username, pin, role: 'admin' });
-    console.log('saveUser result:', result);
+    // 1. Sign up with Supabase Auth (email derived from username)
+    const email = username + '@hisabat.local';
+    const { data: signUpData, error: signUpErr } =
+      await _supaClient.auth.signUp({ email, password: pin });
+    if(signUpErr) throw signUpErr;
+
+    // 2. Call server-side RPC — it enforces "no admin yet" atomically
+    const { error: rpcErr } = await _supaClient.rpc('create_first_admin_profile',
+      { p_name: name, p_username: username });
+    if(rpcErr) throw rpcErr;
+
     document.getElementById('firstRunScreen').style.display = 'none';
     document.getElementById('lockScreen').style.display = 'flex';
-    showToast('✅ تم إنشاء حساب الأدمن، سجّل دخولك الآن');
+    showToast('✅ تم إنشاء حساب الأدمن — سجّل دخولك الآن');
     setTimeout(()=>document.getElementById('loginUser').focus(), 100);
   }catch(e){
-    console.error('createFirstAdmin error:', e);
     errEl.textContent = '⚠️ ' + (e?.message || 'خطأ في الاتصال بالسيرفر');
-    btn.disabled = false;
-    btn.textContent = 'إنشاء الحساب ✓';
+    btn.disabled = false; btn.textContent = 'إنشاء الحساب ✓';
   }
 }
 
-// تحقق عند الفتح — أول مرة أم لا
+// ── Check first-run on load ───────────────────────────────────────────────
 async function checkFirstRun(){
-  const admin = await hasAdmin();
-  if(!admin){
+  const adminExists = await hasAdminAccount();
+  if(!adminExists){
     document.getElementById('lockScreen').style.display = 'none';
     document.getElementById('firstRunScreen').style.display = 'flex';
   }
 }
 
-async function loadSession(){
-  try{
-    const s = JSON.parse(lsGet(SESSION_KEY));
-    if(s){
-      const users = await getUsers();
-      const u = users.find(x=>x.id===s.id);
-      if(u){ currentUser = u; return true; }
-    }
-  }catch{}
-  return false;
+// ── Load profile after auth ───────────────────────────────────────────────
+async function _loadProfile(userId){
+  const { data, error } = await _supaClient
+    .from('profiles')
+    .select('id, user_id, name, username, role, is_active')
+    .eq('user_id', userId)
+    .single();
+  if(error || !data || !data.is_active) return null;
+  return data;
 }
-function saveSession(u){ lsSet(SESSION_KEY, JSON.stringify({id:u.id})); }
-function clearSession(){ lsDel(SESSION_KEY); currentUser=null; }
 
-// هل اليوزر الحالي عنده صلاحية؟
+// ── Sign in ───────────────────────────────────────────────────────────────
+async function tryUnlock(){
+  const username = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pin      = document.getElementById('loginPin').value.trim();
+  const errEl    = document.getElementById('lockErr');
+  errEl.textContent = '';
+
+  // Rate-limit check
+  const locked = _rlIsLocked();
+  if(locked !== false){
+    errEl.textContent = `⛔ كثير من المحاولات الفاشلة — انتظر ${locked} دقيقة`;
+    return;
+  }
+
+  if(!username || !pin){
+    errEl.textContent = '⚠️ أدخل اسم المستخدم وكلمة المرور';
+    return;
+  }
+
+  const email = username + '@hisabat.local';
+
+  const { data, error } = await _supaClient.auth.signInWithPassword({ email, password: pin });
+
+  if(error || !data?.user){
+    _rlFail();
+    errEl.textContent = '❌ اسم المستخدم أو كلمة المرور غلط';
+    const inp = document.getElementById('loginPin');
+    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    inp.value = ''; inp.focus();
+    return;
+  }
+
+  // Load profile / role from DB (server-side — cannot be tampered)
+  const profile = await _loadProfile(data.user.id);
+  if(!profile){
+    await _supaClient.auth.signOut();
+    errEl.textContent = '❌ الحساب غير نشط — تواصل مع المدير';
+    return;
+  }
+
+  _rlReset();
+  currentUser = profile;
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPin').value  = '';
+  applyRoleUI();
+  showToast(`👋 أهلاً ${profile.name}`);
+}
+
+// ── Sign out ──────────────────────────────────────────────────────────────
+async function lockApp(){
+  currentUser = null;
+  await _supaClient.auth.signOut();
+  document.getElementById('lockScreen').style.display = 'flex';
+  setTimeout(()=>document.getElementById('loginUser').focus(), 50);
+}
+
+// ── Restore session on page load ─────────────────────────────────────────
+async function loadSession(){
+  const { data: { session } } = await _supaClient.auth.getSession();
+  if(!session?.user) return false;
+  const profile = await _loadProfile(session.user.id);
+  if(!profile){
+    await _supaClient.auth.signOut();
+    return false;
+  }
+  currentUser = profile;
+  return true;
+}
+
+// Listen for session expiry / token refresh
+_supaClient.auth.onAuthStateChange(async (event, session)=>{
+  if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
+    currentUser = null;
+    document.getElementById('lockScreen').style.display = 'flex';
+    showToast('🔒 انتهت الجلسة — سجّل دخولك مرة أخرى');
+  }
+  if(event === 'TOKEN_REFRESHED' && session){
+    // Silently verify profile still active
+    const profile = await _loadProfile(session.user.id);
+    if(!profile){
+      await _supaClient.auth.signOut();
+    } else {
+      currentUser = profile;
+    }
+  }
+});
+
+// ── Permissions (UI-only; real enforcement is RLS) ────────────────────────
 function can(perm){
   if(!currentUser) return false;
   return ROLE_PERMS[currentUser.role]?.includes(perm) || false;
 }
 
-// تسجيل الدخول
-async function tryUnlock(){
-  const username = document.getElementById('loginUser').value.trim().toLowerCase();
-  const pin      = document.getElementById('loginPin').value.trim();
-  const errEl    = document.getElementById('lockErr');
+// ── User management (all ops via Edge Function) ──────────────────────────
+let _usersCache = null;
 
-  const users = await getUsers();
-  const user  = users.find(u => u.username.toLowerCase()===username && u.pin===pin);
-
-  if(user){
-    currentUser = user;
-    saveSession(user);
-    document.getElementById('lockScreen').style.display='none';
-    document.getElementById('loginUser').value='';
-    document.getElementById('loginPin').value='';
-    errEl.textContent='';
-    applyRoleUI();
-    showToast(`👋 أهلاً ${user.name}`);
-  } else {
-    errEl.textContent = '❌ اسم المستخدم أو الرقم السري غلط';
-    const inp = document.getElementById('loginPin');
-    inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
-    inp.value=''; inp.focus();
-  }
+async function getUsers(){
+  if(_usersCache) return _usersCache;
+  try{
+    const data = await edgeFetch('list-users');
+    _usersCache = data.users || [];
+  }catch(e){ _usersCache = []; console.error('getUsers:', e); }
+  return _usersCache;
 }
 
-function lockApp(){
-  clearSession();
-  document.getElementById('lockScreen').style.display='flex';
-  setTimeout(()=>document.getElementById('loginUser').focus(), 50);
-}
+function _invalidateUsersCache(){ _usersCache = null; }
 
-// تطبيق صلاحيات اليوزر على الـ UI
-function applyRoleUI(){
-  if(!currentUser) return;
-
-  // تحديث اسم اليوزر في السايدبار
-  const badge = document.getElementById('userBadge');
-  if(badge){
-    badge.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:32px;height:32px;border-radius:50%;
-             background:${ROLE_COLOR[currentUser.role]};
-             display:flex;align-items:center;justify-content:center;
-             font-size:14px;font-weight:900;color:#fff">
-          ${currentUser.name.charAt(0)}
-        </div>
-        <div>
-          <div style="color:#fff;font-size:12px;font-weight:800">${currentUser.name}</div>
-          <div style="color:rgba(255,255,255,.5);font-size:10px">${ROLE_LABEL[currentUser.role]}</div>
-        </div>
-      </div>`;
-  }
-
-  // ربط كل صفحة بالصلاحية المطلوبة
-  const pageMap = {
-    'pg-daily':     'daily',
-    'pg-search':    'search',
-    'pg-report':    'reports',
-    'pg-analytics': 'analytics',
-    'pg-inventory': 'products',
-    'pg-invoice':   'invoices',
-    'pg-clients':   'clients',
-    'pg-catalog':   'catalog',
-  };
-
-  // إخفاء/إظهار nav items بناءً على الصلاحيات
-  document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
-    const pg   = btn.getAttribute('data-page');
-    const perm = pageMap[pg];
-    btn.style.display = (!perm || can(perm)) ? '' : 'none';
-  });
-
-  // إخفاء إدارة المستخدمين لغير الأدمن
-  const usersNavItem = document.getElementById('navUsers');
-  if(usersNavItem) usersNavItem.style.display = can('users') ? '' : 'none';
-
-  // توجيه اليوزر للصفحة المناسبة حسب دوره
-  if(currentUser.role === 'cashier')    goPage('pg-invoice');
-  else if(currentUser.role === 'store') goPage('pg-inventory');
-  else if(can('daily'))                 goPage('pg-daily');
-  else if(can('invoices'))              goPage('pg-invoice');
-  else if(can('products'))              goPage('pg-inventory');
-
-  // تطبيق الصلاحيات على الموبايل
-  applyMobileNavRole();
-
-  // رسالة الترحيب
-  setTimeout(()=> showWelcome(currentUser ? currentUser.name : ''), 400);
-}
-
-// helper: navigate to page (like showPage but finds the matching nav button)
-function goPage(pageId){
-  const navMap = {
-    'pg-daily':     'nav-daily',
-    'pg-search':    'nav-search',
-    'pg-report':    'nav-report',
-    'pg-analytics': 'nav-analytics',
-    'pg-inventory': 'nav-inventory',
-    'pg-invoice':   'nav-invoice',
-    'pg-clients':   'nav-clients',
-    'pg-catalog':   'nav-catalog',
-  };
-  const btnId = navMap[pageId];
-  const btn = btnId ? document.getElementById(btnId) : null;
-  if(btn) showPage(pageId, btn);
-}
-
-// ── إدارة المستخدمين (للأدمن بس) ──
+// ── Users manager modal ───────────────────────────────────────────────────
 async function openUsersManager(){
   if(!can('users')){ showToast('⚠️ مش مسموح'); return; }
   await renderUsersManager();
@@ -4530,23 +4561,24 @@ async function renderUsersManager(){
     <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;
                 border-bottom:1px solid #f1f5f9;background:#fff">
       <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;
-           background:${ROLE_COLOR[u.role]};display:flex;align-items:center;
+           background:${ROLE_COLOR[u.role] || '#888'};display:flex;align-items:center;
            justify-content:center;font-size:16px;font-weight:900;color:#fff">
-        ${u.name.charAt(0)}
+        ${esc(u.name.charAt(0))}
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:800;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.name)}</div>
         <div style="font-size:11px;color:#94a3b8;margin-top:1px">
           ${esc(u.username)} &nbsp;·&nbsp;
-          <span style="color:${ROLE_COLOR[u.role]};font-weight:700">${ROLE_LABEL[u.role]}</span>
+          <span style="color:${ROLE_COLOR[u.role] || '#888'};font-weight:700">${ROLE_LABEL[u.role] || u.role}</span>
+          ${!u.is_active ? '<span style="color:#ef4444;font-weight:700"> · معطّل</span>' : ''}
         </div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        <button onclick="openEditUserModal(${u.id})"
+        <button onclick="openEditUserModal('${esc(u.user_id)}')"
           style="background:#eff6ff;border:none;border-radius:7px;padding:5px 10px;
                  font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;
                  color:#2563eb;cursor:pointer">✏️ تعديل</button>
-        <button onclick="confirmDeleteUser(${u.id})"
+        <button onclick="confirmDeleteUser('${esc(u.user_id)}')"
           style="background:#fef2f2;border:none;border-radius:7px;padding:5px 10px;
                  font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;
                  color:#ef4444;cursor:pointer">🗑️</button>
@@ -4560,29 +4592,26 @@ async function addNewUser(){
   const pin      = document.getElementById('newUserPin').value.trim();
   const role     = document.getElementById('newUserRole').value;
 
-  if(!name)    { showToast('⚠️ أدخل الاسم الكامل'); return; }
-  if(!username){ showToast('⚠️ أدخل اسم الدخول'); return; }
-  if(!/^\d{4,8}$/.test(pin)){ showToast('⚠️ الـ PIN لازم يكون 4-8 أرقام'); return; }
+  if(!name)         { showToast('⚠️ أدخل الاسم الكامل'); return; }
+  if(!username)     { showToast('⚠️ أدخل اسم الدخول'); return; }
+  if(pin.length < 4){ showToast('⚠️ كلمة المرور لازم 4 أحرف على الأقل'); return; }
 
-  const users = await getUsers();
-  if(users.find(u=>u.username.toLowerCase()===username)){
-    showToast('⚠️ اسم الدخول ده موجود بالفعل'); return;
-  }
   try{
-    await saveUser({ name, username, pin, role });
+    await edgeFetch('create-user', { name, username, password: pin, role });
+    _invalidateUsersCache();
     await renderUsersManager();
     ['newUserName','newUserUsername','newUserPin'].forEach(id=>{
       document.getElementById(id).value='';
     });
     showToast(`✅ تمت إضافة "${name}" بنجاح`);
-  }catch(e){ showToast('⚠️ خطأ في الحفظ'); }
+  }catch(e){ showToast('⚠️ ' + e.message); }
 }
 
 async function openEditUserModal(userId){
   const users = await getUsers();
-  const u = users.find(x=>x.id===userId);
+  const u = users.find(x=>x.user_id===userId);
   if(!u) return;
-  document.getElementById('editUserId').value       = u.id;
+  document.getElementById('editUserId').value       = u.user_id;
   document.getElementById('editUserName').value     = u.name;
   document.getElementById('editUserUsername').value = u.username;
   document.getElementById('editUserPin').value      = '';
@@ -4594,7 +4623,7 @@ function closeEditUserModal(){
 }
 
 async function saveEditUser(){
-  const id       = parseInt(document.getElementById('editUserId').value);
+  const userId   = document.getElementById('editUserId').value;
   const name     = document.getElementById('editUserName').value.trim();
   const username = document.getElementById('editUserUsername').value.trim().toLowerCase();
   const pin      = document.getElementById('editUserPin').value.trim();
@@ -4602,40 +4631,46 @@ async function saveEditUser(){
 
   if(!name)    { showToast('⚠️ أدخل الاسم'); return; }
   if(!username){ showToast('⚠️ أدخل اسم الدخول'); return; }
-  if(pin && !/^\d{4,8}$/.test(pin)){ showToast('⚠️ الـ PIN لازم يكون 4-8 أرقام'); return; }
-
-  const users = await getUsers();
-  if(users.find(u=>u.username.toLowerCase()===username && u.id!==id)){
-    showToast('⚠️ اسم الدخول ده مستخدم من شخص تاني'); return;
-  }
-
-  const data = { name, username, role };
-  if(pin) data.pin = pin;
+  if(pin && pin.length < 4){ showToast('⚠️ كلمة المرور لازم 4 أحرف على الأقل'); return; }
 
   try{
-    await updateUser(id, data);
+    const payload = { userId, name, username, role };
+    if(pin) payload.password = pin;
+    await edgeFetch('update-user', payload);
+    _invalidateUsersCache();
     await renderUsersManager();
     closeEditUserModal();
     showToast(`✅ تم تعديل بيانات "${name}"`);
-  }catch(e){ showToast('⚠️ خطأ في التعديل'); }
+  }catch(e){ showToast('⚠️ ' + e.message); }
 }
 
 async function confirmDeleteUser(userId){
   const users = await getUsers();
-  const u = users.find(x=>x.id===userId);
+  const u = users.find(x=>x.user_id===userId);
   if(!u) return;
-  // منع حذف آخر أدمن
-  const admins = users.filter(x=>x.role==='admin');
-  if(u.role==='admin' && admins.length<=1){ showToast('⚠️ لازم يفضل أدمن واحد على الأقل'); return; }
   if(!confirm(`هتحذف "${u.name}"؟`)) return;
   try{
-    await deleteUser(userId);
+    await edgeFetch('delete-user', { userId });
+    _invalidateUsersCache();
     await renderUsersManager();
     showToast(`🗑️ تم حذف "${u.name}"`);
-  }catch(e){ showToast('⚠️ خطأ في الحذف'); }
+  }catch(e){ showToast('⚠️ ' + e.message); }
 }
 
-// إغلاق المودالات بالضغط على الخلفية
+// ── Initialise on load ────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async ()=>{
+  const session = await loadSession();
+  if(session){
+    document.getElementById('lockScreen').style.display='none';
+    applyRoleUI();
+  } else {
+    await checkFirstRun();
+    const adminExists = await hasAdminAccount();
+    if(adminExists) document.getElementById('loginUser').focus();
+  }
+});
+
+// Modal backdrop dismiss
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('usersModal').addEventListener('click',function(e){
     if(e.target===this) closeUsersModal();
@@ -4645,20 +4680,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-// تهيئة شاشة الدخول
-window.addEventListener('DOMContentLoaded', async ()=>{
-  const session = await loadSession();
-  if(session){
-    document.getElementById('lockScreen').style.display='none';
-    applyRoleUI();
-  } else {
-    await checkFirstRun();
-    const admin = await hasAdmin();
-    if(admin) document.getElementById('loginUser').focus();
-  }
-});
-
-// للتوافق مع الكود القديم
+// Legacy stubs (keep old call-sites working)
 function getStoredPw(){ return ''; }
 function openChangePw(){ openUsersManager(); }
 function closePwModal(){ closeUsersModal(); }
