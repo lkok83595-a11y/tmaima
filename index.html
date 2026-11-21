@@ -4368,9 +4368,9 @@ function _rlReset(){ _rlSave({count:0,until:0}); }
 
 // ── First-run: does any admin exist? ─────────────────────────────────────
 async function hasAdminAccount(){
-  const { data, error } = await _supaClient.rpc('has_admin_account');
+  const { data, error } = await _supaClient.from('users').select('id').eq('role','admin').limit(1);
   if(error) throw error;
-  return !!data;
+  return data && data.length > 0;
 }
 
 // ── First-run: create first admin ────────────────────────────────────────
@@ -4451,11 +4451,13 @@ async function tryUnlock(){
     return;
   }
 
-  const email = username + '@hisabat.local';
+  const { data, error } = await _supaClient
+    .from('users')
+    .select('id, name, username, pin, role')
+    .eq('username', username)
+    .single();
 
-  const { data, error } = await _supaClient.auth.signInWithPassword({ email, password: pin });
-
-  if(error || !data?.user){
+  if(error || !data || data.pin !== pin){
     _rlFail();
     errEl.textContent = '❌ اسم المستخدم أو كلمة المرور غلط';
     const inp = document.getElementById('loginPin');
@@ -4464,61 +4466,38 @@ async function tryUnlock(){
     return;
   }
 
-  // Load profile / role from DB (server-side — cannot be tampered)
-  const profile = await _loadProfile(data.user.id);
-  if(!profile){
-    await _supaClient.auth.signOut();
-    errEl.textContent = '❌ الحساب غير نشط — تواصل مع المدير';
-    return;
-  }
-
   _rlReset();
-  currentUser = profile;
+  currentUser = { id: data.id, name: data.name, username: data.username, role: data.role, is_active: true };
+  // حفظ الجلسة في localStorage
+  localStorage.setItem('_hisabat_user', JSON.stringify(currentUser));
   document.getElementById('lockScreen').style.display = 'none';
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPin').value  = '';
   applyRoleUI();
-  showToast(`👋 أهلاً ${profile.name}`);
+  showToast(`👋 أهلاً ${data.name}`);
 }
 
 // ── Sign out ──────────────────────────────────────────────────────────────
 async function lockApp(){
   currentUser = null;
-  await _supaClient.auth.signOut();
+  localStorage.removeItem('_hisabat_user');
   document.getElementById('lockScreen').style.display = 'flex';
   setTimeout(()=>document.getElementById('loginUser').focus(), 50);
 }
 
 // ── Restore session on page load ─────────────────────────────────────────
 async function loadSession(){
-  const { data: { session } } = await _supaClient.auth.getSession();
-  if(!session?.user) return false;
-  const profile = await _loadProfile(session.user.id);
-  if(!profile){
-    await _supaClient.auth.signOut();
+  try{
+    const saved = localStorage.getItem('_hisabat_user');
+    if(!saved) return false;
+    currentUser = JSON.parse(saved);
+    return true;
+  }catch(e){
     return false;
   }
-  currentUser = profile;
-  return true;
 }
 
-// Listen for session expiry / token refresh
-_supaClient.auth.onAuthStateChange(async (event, session)=>{
-  if(event === 'SIGNED_OUT' || event === 'USER_DELETED'){
-    currentUser = null;
-    document.getElementById('lockScreen').style.display = 'flex';
-    showToast('🔒 انتهت الجلسة — سجّل دخولك مرة أخرى');
-  }
-  if(event === 'TOKEN_REFRESHED' && session){
-    // Silently verify profile still active
-    const profile = await _loadProfile(session.user.id);
-    if(!profile){
-      await _supaClient.auth.signOut();
-    } else {
-      currentUser = profile;
-    }
-  }
-});
+// (Auth state listener removed — using public.users table directly)
 
 // ── Permissions (UI-only; real enforcement is RLS) ────────────────────────
 function can(perm){
