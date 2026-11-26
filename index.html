@@ -5201,7 +5201,7 @@ img,video,canvas,svg{max-width:100%}
         <button class="btn-gen" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#10b981,#059669)" data-h="s157">🟢 إرسال واتساب للمورد</button>
       </div>
     </div>
-    <div style="padding:0 14px 10px"><button class="btn-gen" id="roDownloadAllBtn" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#2563eb,#1d4ed8)">⬇️ تنزيل كل الصور</button></div>
+    <div style="padding:0 14px 10px"><button class="btn-gen" id="roDownloadAllBtn" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#2563eb,#1d4ed8)">⬇️ تنزيل كل الصور</button> <button class="btn-gen" id="roNewOnlyBtn" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#4a4a6a,#2d2b55)">الجديد بس</button></div>
     <div id="reorderList"><div class="empty"><span class="eicon">📦</span><p>اضغط "تحديث القائمة"</p></div></div>
   </div>
 </div>
@@ -21342,6 +21342,26 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     </div>`).join("");
   }
   var reorderRows = [];
+  function roDlLoad() {
+    try {
+      return JSON.parse(localStorage.getItem("tm_ro_dl") || "{}") || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function roDlSave(m) {
+    try {
+      localStorage.setItem("tm_ro_dl", JSON.stringify(m));
+    } catch (e) {
+    }
+  }
+  function roIsDone(r) {
+    const m = roDlLoad()[String(r.id)];
+    return !!m && Number(m.q) === Number(r.suggested);
+  }
+  function roNewOnly() {
+    return localStorage.getItem("tm_ro_newonly") === "1";
+  }
   var fmtQty = (n) => {
     const x = Number(n) || 0;
     return Number.isInteger(x) ? x.toLocaleString("en") : x.toLocaleString("en", { maximumFractionDigits: 2 });
@@ -21394,6 +21414,19 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         r.skip = old.skip;
       }
     });
+    try {
+      const dm = roDlLoad();
+      const ids = new Set(reorderRows.map((r) => String(r.id)));
+      let ch = false;
+      Object.keys(dm).forEach((k) => {
+        if (!ids.has(k)) {
+          delete dm[k];
+          ch = true;
+        }
+      });
+      if (ch) roDlSave(dm);
+    } catch (e) {
+    }
     renderReorderList();
   }
   function renderReorderSummary() {
@@ -21412,14 +21445,23 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       el.innerHTML = `<div class="empty"><span class="eicon">\u2705</span><p>\u0644\u0627 \u062A\u0648\u062C\u062F \u0646\u0648\u0627\u0642\u0635 \u2014 \u0643\u0644 \u0627\u0644\u0645\u0646\u062A\u062C\u0627\u062A \u0641\u0648\u0642 \u062D\u062F \u0627\u0644\u062A\u0646\u0628\u064A\u0647</p></div>`;
       return;
     }
+    const roBtn = document.getElementById("roNewOnlyBtn");
+    if (roBtn) roBtn.textContent = roNewOnly() ? "\u2705 \u0627\u0644\u062C\u062F\u064A\u062F \u0628\u0633 (\u0645\u0641\u0639\u0651\u0644)" : "\u0627\u0644\u062C\u062F\u064A\u062F \u0628\u0633";
+    const roHide = roNewOnly();
+    const roShown = reorderRows.filter((r) => !(roHide && roIsDone(r))).length;
+    if (!roShown) {
+      el.innerHTML = `<div class="empty"><span class="eicon">\u2705</span><p>\u0643\u0644 \u0627\u0644\u0646\u0648\u0627\u0642\u0635 \u0627\u062A\u0646\u0632\u0644\u062A \u0642\u0628\u0644 \u0643\u062F\u0647 \u2014 \u0645\u0641\u064A\u0634 \u062C\u062F\u064A\u062F</p></div>`;
+      return;
+    }
     el.innerHTML = reorderRows.map((r, i) => {
+      if (roHide && roIsDone(r)) return "";
       const stockCls = r.available === 0 ? "out" : "low";
       const stockTxt = r.available === 0 ? "\u0646\u0641\u062F!" : fmtQty(r.available) + " \u0645\u062A\u0627\u062D";
       const roImgOk = typeof r.image === "string" && /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(r.image);
       return `<div class="tm-ro-item${r.skip ? " skip" : ""}">
       ${roImgOk ? `<img alt="" src="${esc3(r.image)}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex:0 0 auto;background:#f4f5fb">` : `<div style="width:48px;height:48px;border-radius:8px;background:#e2e4f0;color:#8888aa;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto">\u{1F4E6}</div>`}
       <div class="tm-ro-info">
-        <div class="tm-ro-name">${esc3(r.name)} ${r.code ? `<span class="tm-ro-code">${esc3(r.code)}</span>` : ""}</div>
+        <div class="tm-ro-name">${esc3(r.name)} ${roIsDone(r) ? `<span style="font-size:11px;background:#d1fae5;color:#047857;padding:1px 6px;border-radius:4px;font-weight:800">\u2713 \u0627\u062A\u0646\u0632\u0644</span>` : ""} ${r.code ? `<span class="tm-ro-code">${esc3(r.code)}</span>` : ""}</div>
         <div class="tm-ro-meta">${esc3(r.category || "\u0628\u062F\u0648\u0646 \u0641\u0626\u0629")}${r.reserved > 0 ? ` \xB7 ${fmtQty(r.reserved)} \u0645\u062D\u062C\u0648\u0632` : ""}</div>
       </div>
       <span class="tm-ro-stock ${stockCls}">${stockTxt}</span>
@@ -21517,7 +21559,13 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       document.body.appendChild(link);
       link.click();
       setTimeout(() => document.body.removeChild(link), 100);
-      if (!quiet) showToast("\u2705 \u062A\u0645 \u062A\u062D\u0645\u064A\u0644 \u0635\u0648\u0631\u0629 \u0627\u0644\u0635\u0646\u0641");
+      const dm = roDlLoad();
+      dm[String(r.id)] = { q: Number(r.suggested), t: Date.now() };
+      roDlSave(dm);
+      if (!quiet) {
+        showToast("\u2705 \u062A\u0645 \u062A\u062D\u0645\u064A\u0644 \u0635\u0648\u0631\u0629 \u0627\u0644\u0635\u0646\u0641");
+        renderReorderList();
+      }
       resolve();
     };
     if (r.image) {
@@ -21531,7 +21579,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   async function downloadAllReorderImages() {
     const idx = [];
     reorderRows.forEach((r, i) => {
-      if (!r.skip && Number(r.suggested) > 0) idx.push(i);
+      if (!r.skip && Number(r.suggested) > 0 && !(roNewOnly() && roIsDone(r))) idx.push(i);
     });
     if (!idx.length) {
       showToast("\u26A0\uFE0F \u0644\u0627 \u062A\u0648\u062C\u062F \u0623\u0635\u0646\u0627\u0641 \u0641\u064A \u0627\u0644\u0642\u0627\u0626\u0645\u0629");
@@ -21543,9 +21591,14 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       await new Promise((r2) => setTimeout(r2, 500));
     }
     showToast("\u2705 \u062A\u0645 \u062A\u062D\u0645\u064A\u0644 " + idx.length + " \u0635\u0648\u0631\u0629");
+    renderReorderList();
   }
   document.addEventListener("click", (ev) => {
     if (ev.target && ev.target.closest && ev.target.closest("#roDownloadAllBtn")) downloadAllReorderImages();
+    else if (ev.target && ev.target.closest && ev.target.closest("#roNewOnlyBtn")) {
+      localStorage.setItem("tm_ro_newonly", roNewOnly() ? "0" : "1");
+      renderReorderList();
+    }
   });
   function reorderBump(i, d) {
     const r = reorderRows[i];
