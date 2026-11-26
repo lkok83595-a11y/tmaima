@@ -21566,12 +21566,12 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     renderInvoiceList();
   }
   function openInvEditModal(id) {
-    if (currentUser?.role !== "admin") {
-      showToast("\u26D4 \u0635\u0644\u0627\u062D\u064A\u0629 \u0627\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637");
-      return;
-    }
     const inv2 = invoices.find((x) => x.id === id);
     if (!inv2) return;
+    if (currentUser?.role !== "admin" && !(can("invoices") && !inv2.confirmed && invMine(inv2))) {
+      showToast(inv2.confirmed ? "\u{1F512} \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 \u0645\u0624\u0643\u062F\u0629 \u0648\u0645\u0642\u0641\u0648\u0644\u0629 \u2014 \u0644\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637" : "\u26D4 \u0635\u0644\u0627\u062D\u064A\u0629 \u0627\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637");
+      return;
+    }
     document.getElementById("invEditId").value = id;
     document.getElementById("invEditClient").value = inv2.client || "";
     document.getElementById("invEditDate").value = inv2.date || "";
@@ -21650,7 +21650,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }
     const id = parseInt(document.getElementById("invEditId").value);
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     if (invLocked(inv2)) {
       showToast("\u{1F512} \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 \u0645\u0624\u0643\u062F\u0629 \u0648\u0645\u0642\u0641\u0648\u0644\u0629 \u2014 \u0644\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637");
       return;
@@ -23295,8 +23295,8 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     </div>`;
     }).join("");
   }
-  var LABEL_W_MM = 40;
-  var LABEL_H_MM = 30;
+  var LABEL_W_MM = 76;
+  var LABEL_H_MM = 51;
   var LABEL_GAP = 3;
   var LABEL_SPEED = 4;
   var LABEL_DENSITY = 8;
@@ -23311,11 +23311,30 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     gapMM = gapMM || LABEL_GAP;
     const W = Math.round(wMM * 8);
     const H = Math.round(hMM * 8);
-    const x0 = 4;
-    const codeY = 4;
-    const priceY = 36;
-    const bcY = price ? 72 : 40;
-    const bcH = Math.max(40, H - bcY - 10);
+    const M = 24;
+    const cs = String(code);
+    const digits = /^\d+$/.test(cs);
+    const symbols = digits ? 1 + Math.floor(cs.length / 2) + (cs.length % 2 ? 2 : 0) + 1 : cs.length + 2;
+    const modules = 11 * symbols + 13;
+    const narrow = Math.max(1, Math.min(2, Math.floor((W - 2 * M) / (modules + 20))));
+    const bcW = modules * narrow;
+    const codeTxt = "Code: " + code;
+    const fit = (t) => String(t).length * 32 <= W - 2 * M ? 2 : 1;
+    const mCode = fit(codeTxt);
+    const mPrice = price ? fit(price) : 1;
+    const hCode = 24 * mCode;
+    const hPrice = price ? 24 * mPrice : 0;
+    const gap = 10;
+    const bcH = 64;
+    const offPrice = hCode + gap;
+    const offBc = price ? offPrice + hPrice + gap + 4 : hCode + gap + 4;
+    const blockH = offBc + bcH;
+    const top = Math.max(M, Math.round((H - blockH) / 2));
+    const codeY = top;
+    const priceY = top + offPrice;
+    const bcY = top + offBc;
+    const cx = (t, m) => Math.max(M, Math.round((W - String(t).length * 16 * m) / 2));
+    const bx = Math.max(M, Math.round((W - bcW) / 2));
     const lines = [
       `SIZE ${wMM} mm,${hMM} mm`,
       `GAP ${gapMM} mm,0 mm`,
@@ -23324,11 +23343,11 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       `DIRECTION 0`,
       `CLS`
     ];
-    lines.push(`TEXT ${x0},${codeY},"3",0,1,1,"Code: ${code}"`);
+    lines.push(`TEXT ${cx(codeTxt, mCode)},${codeY},"3",0,${mCode},${mCode},"${codeTxt}"`);
     if (price) {
-      lines.push(`TEXT ${x0},${priceY},"3",0,1,1,"${price}"`);
+      lines.push(`TEXT ${cx(price, mPrice)},${priceY},"3",0,${mPrice},${mPrice},"${price}"`);
     }
-    lines.push(`BARCODE ${x0},${bcY},"128",${bcH},0,0,2,2,"${code}"`);
+    lines.push(`BARCODE ${bx},${bcY},"128",${bcH},0,0,${narrow},${narrow},"${code}"`);
     lines.push(`PRINT 1,1`);
     lines.push("");
     return lines.join("\r\n");
@@ -24537,6 +24556,9 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }
   }
   var invUI = { view: "home", tab: "cust", custKey: null, detailId: null, from: "home", cf: "all", step: 1 };
+  function invMine(inv2) {
+    return !currentUser || currentUser.role === "admin" || !!inv2 && (inv2.cashierName || "") === currentUser.name;
+  }
   function invVisibleList() {
     const admin = !currentUser || currentUser.role === "admin";
     return admin ? invoices : invoices.filter((i) => (i.cashierName || "") === currentUser.name);
@@ -24640,7 +24662,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   function invRenderDetail() {
     const inv2 = invoices.find((i) => i.id === invUI.detailId);
-    if (!inv2) {
+    if (!inv2 || !invMine(inv2)) {
       invBack();
       return;
     }
@@ -24835,7 +24857,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     else if (a === "inv-open") {
       invUI.from = invUI.view === "cust" ? "cust" : "home";
       const f = invoices.find((i) => String(i.id) === String(t.dataset.id));
-      if (!f) return;
+      if (!f || !invMine(f)) return;
       invUI.detailId = f.id;
       invShow("detail");
       invRenderDetail();
@@ -24904,7 +24926,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       printInvoice(P0);
     }, inv2.id)}">\u{1F5A8}\uFE0F \u0639\u0631\u0636 / \u0637\u0628\u0627\u0639\u0629</button>
         ${confirmBtn}${shipBtn}${unshipBtn}
-        ${isAdmin ? `<button class="btn-inv-print" style="color:var(--blue);border-color:var(--blue)" data-h="${__hd("click", function(event, P0) {
+        ${isAdmin || !isConfirmed && can("invoices") && invMine(inv2) ? `<button class="btn-inv-print" style="color:var(--blue);border-color:var(--blue)" data-h="${__hd("click", function(event, P0) {
       openInvEditModal(P0);
     }, inv2.id)}">\u270F\uFE0F \u062A\u0639\u062F\u064A\u0644</button>` : ""}
         ${(inv2.payStatus === "part" || inv2.payStatus === "debt") && !invLocked(inv2) ? `<button class="btn-inv-print" style="color:var(--green);border-color:var(--green)" data-h="${__hd("click", function(event, P0) {
@@ -24935,7 +24957,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     else if (invFilter === "shipped") list = list.filter((i) => i.shipped);
     else if (invFilter === "ship") list = list.filter((i) => i.payStatus === "ship");
     else if (invFilter !== "all") list = list.filter((i) => i.payStatus === invFilter);
-    document.getElementById("invCount").textContent = list.length + "/" + invoices.length;
+    document.getElementById("invCount").textContent = list.length + "/" + invVisibleList().length;
     if (!list.length) {
       el.innerHTML = `<div class="empty"><span class="eicon">\u{1F9FE}</span><p>${invoices.length ? "\u0644\u0627 \u062A\u0648\u062C\u062F \u0646\u062A\u0627\u0626\u062C" : "\u0644\u0627 \u062A\u0648\u062C\u062F \u0641\u0648\u0627\u062A\u064A\u0631 \u0628\u0639\u062F"}</p></div>`;
       return;
@@ -24984,7 +25006,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   async function markInvConfirmed(id) {
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     if (!confirm(`\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628 \u0631\u0642\u0645 ${inv2.num}\u061F
 \u062F\u0647 \u0628\u064A\u0639\u0646\u064A \u0625\u0646 \u0627\u0644\u0637\u0644\u0628 \u062A\u0645 \u0645\u0631\u0627\u062C\u0639\u062A\u0647 \u0648\u062C\u0627\u0647\u0632 \u0644\u0644\u0634\u062D\u0646.`)) return;
     const confirmedAt = (/* @__PURE__ */ new Date()).toISOString();
@@ -25001,7 +25023,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   async function markInvShipped(id) {
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     if (!confirm(`\u062A\u0623\u0643\u064A\u062F \u0634\u062D\u0646 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 ${inv2.num}\u061F`)) return;
     const shippedAt = (/* @__PURE__ */ new Date()).toISOString();
     try {
@@ -25017,7 +25039,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   async function unmarkInvShipped(id) {
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     if (invLocked(inv2)) {
       showToast("\u{1F512} \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 \u0645\u0624\u0643\u062F\u0629 \u0648\u0645\u0642\u0641\u0648\u0644\u0629 \u2014 \u0644\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637");
       return;
@@ -25040,7 +25062,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       return;
     }
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     if (invLocked(inv2)) {
       showToast("\u{1F512} \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 \u0645\u0624\u0643\u062F\u0629 \u0648\u0645\u0642\u0641\u0648\u0644\u0629 \u2014 \u0644\u0644\u0623\u062F\u0645\u0646 \u0641\u0642\u0637");
       return;
@@ -25329,7 +25351,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   function printInvoice(id) {
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2) return;
+    if (!inv2 || !invMine(inv2)) return;
     currentPrintInvId = id;
     window.__invItemCount = (inv2.items || []).length;
     setTimeout(applyInvWidth, 0);
