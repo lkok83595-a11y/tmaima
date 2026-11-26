@@ -1154,6 +1154,44 @@ tbody tr:last-child td{border-bottom:none}
 .prm-foot-sub{color:rgba(255,255,255,.4);font-size:9px;margin-top:2px;font-weight:600}
 .prm-foot-contacts li{list-style:none;font-size:10px;color:rgba(255,255,255,.6);font-weight:700;padding:2px 0;display:flex;align-items:center;gap:5px}
 
+
+/* ── Classic invoice layout (MOMOBILLS style) ── */
+.prm-sheet{position:relative;direction:ltr;font-family:'Cairo',Arial,'Segoe UI',Tahoma,sans-serif;color:#111;border-radius:12px 12px 0 0;padding:0 0 10px}
+.prm-sheet::before{display:none!important}
+.prm-sheet .mb-top{display:flex;align-items:center;background:#e5e5e5;font-size:13px;font-weight:700;padding:9px 14px;gap:14px}
+.mb-top-l{flex:1}.mb-top-n{min-width:60px;text-align:right}.mb-top-d{min-width:110px;text-align:center;border-left:2px solid #fff;padding-left:14px}
+.mb-co{display:flex;align-items:center;gap:14px;padding:14px 14px 12px;flex-wrap:wrap}
+.mb-logo{width:72px;height:58px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:34px}
+.mb-logo img{width:100%;height:100%;object-fit:contain}
+.mb-coname{flex:1;min-width:110px;font-size:20px;font-weight:600;line-height:1.2}
+.mb-coname-en{font-size:10px;color:#777;letter-spacing:1px}
+.mb-cocontact{font-size:11px;line-height:1.5;text-align:right;max-width:46%;direction:auto}
+.mb-cocontact span{display:block}
+.mb-to{display:flex;justify-content:space-between;gap:12px;border-top:1px solid #777;padding:7px 14px 8px;font-size:12px;flex-wrap:wrap}
+.mb-lbl,.mb-k{font-weight:700}
+.mb-cli{font-size:13px;font-weight:700}.mb-cli-s{font-size:11px;color:#333}
+.mb-to-r{line-height:1.6}
+.mb-tbl{width:calc(100% - 28px);margin:2px 14px 0;border-collapse:collapse;font-size:11.5px}
+.mb-tbl th,.mb-tbl td{border:1px solid #333;padding:2px 6px;text-align:left}
+.mb-tbl th{font-weight:600;background:#fff!important;color:#111!important;font-size:11.5px!important}
+.mb-tbl .c-n{text-align:right;white-space:nowrap}.mb-tbl .c-sr{width:30px}
+.mb-tbl tbody td:nth-child(2){width:99%;word-break:break-word}
+.mb-tbl tfoot td{font-weight:600}
+.mb-sum{display:flex;flex-direction:column;align-items:flex-end;margin:8px 14px 0;gap:2px;font-size:12px}
+.mb-sum-r{display:flex;justify-content:space-between;gap:30px;min-width:200px;padding:0 10px}
+.mb-total{display:flex;justify-content:space-between;gap:30px;background:#e5e5e5;font-weight:700;font-size:15px;padding:5px 10px;min-width:260px}
+.mb-rem{margin:12px 14px 0}
+.mb-rem-h{background:#e5e5e5;font-size:12px;font-weight:700;padding:2px 6px}
+.mb-rem-t{font-size:11px;line-height:1.6;padding:3px 4px 0;white-space:pre-line}
+.mb-rem-t:empty{display:none}
+.mb-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:12px 14px 0}
+.mb-codes{display:flex;align-items:center;gap:10px;flex:1}
+.mb-codes .prm-bc-wrap{max-width:200px}
+.mb-sig{text-align:right;font-size:12px;min-width:120px}
+.mb-sig-l{font-size:11px;margin-top:3px}.mb-tag{text-align:center;font-size:12px;margin:14px 14px 0;color:#333}.mb-wm{position:absolute;left:50%;top:48%;width:200px;height:150px;transform:translate(-50%,-50%);opacity:.08;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain}
+.mb-sigline{border-bottom:1px solid #555;height:26px;margin-top:4px}
+@media (max-width:520px){.mb-co{gap:8px}.mb-logo{width:56px;height:46px}.mb-coname{font-size:17px}.mb-cocontact{max-width:100%;text-align:left}.mb-tbl{font-size:10.5px}}
+
 /* ── @print — مهم للطباعة ── */
 @media print{
   #invPrintModal{display:flex!important;position:static!important;background:none!important;backdrop-filter:none!important;padding:0!important}
@@ -6145,114 +6183,50 @@ img,video,canvas,svg{max-width:100%}
   <div class="inv-print-box">
     <!-- ═══ Premium Invoice Sheet ═══ -->
     <div class="prm-sheet">
-      <!-- هيدر الشركة -->
-      <div class="prm-hd" id="prmHd">
-        <div class="prm-co">
-          <div class="prm-co-wrap">
-            <div class="prm-co-logo" id="prmCoLogo">🏪</div>
-            <div>
-              <div class="prm-co-name" id="prmCoName">متجرك</div>
-              <div class="prm-co-name-en" id="prmCoNameEn">YOUR STORE</div>
-            </div>
-          </div>
-          <div class="prm-co-contacts" id="prmCoContacts"></div>
+      <div class="mb-top"><span class="mb-top-l">INVOICE</span><span class="mb-top-n" id="prmInvNum">0001</span><span class="mb-top-d" id="prmInvDate"></span></div>
+      <div class="mb-co">
+        <div class="mb-logo" id="prmCoLogo"></div>
+        <div class="mb-coname"><div id="prmCoName">Tmima Shoes</div><div class="mb-coname-en" id="prmCoNameEn"></div></div>
+        <div class="mb-cocontact" id="prmCoContacts"></div>
+      </div>
+      <div class="mb-to">
+        <div class="mb-to-l">
+          <div class="mb-lbl">TO,</div>
+          <div class="mb-cli" id="prmCliName">—</div>
+          <div class="mb-cli-s" id="prmCliAddr"></div>
+          <div class="mb-cli-s" id="prmCliPhone"></div>
         </div>
-        <div class="prm-badge">
-          <div class="prm-badge-word">Tax Invoice · فاتورة</div>
-          <div class="prm-badge-num" id="prmInvNum">#INV-0001 <small id="prmInvYear"></small></div>
-          <div class="prm-badge-date" id="prmInvDate"></div>
-          <div class="prm-badge-status paid" id="prmInvStatus">✅ مدفوعة بالكامل</div>
+        <div class="mb-to-r">
+          <div><span class="mb-k">Date:</span> <span id="prmDueDate"></span></div>
+          <div><span class="mb-k">Payment:</span> <span id="prmPayMethod"></span></div>
+          <div id="prmCashierRow"><span class="mb-k">Cashier:</span> <span id="prmCashier"></span></div>
         </div>
       </div>
-      <!-- شريط ملوّن -->
-      <div style="height:3px" id="prmRainbow"></div>
-      <!-- بيانات العميل -->
-      <div class="prm-clibar" id="prmCliBar">
-        <div class="prm-cb-cell">
-          <div class="prm-cb-lbl">بيانات العميل</div>
-          <div class="prm-cb-val" id="prmCliName">—</div>
-          <div class="prm-cb-sub" id="prmCliPhone"></div>
-        </div>
-        <div class="prm-cb-div"></div>
-        <div class="prm-cb-cell">
-          <div class="prm-cb-lbl">العنوان</div>
-          <div class="prm-cb-val" id="prmCliAddr">—</div>
-        </div>
-        <div class="prm-cb-div"></div>
-        <div class="prm-cb-cell">
-          <div class="prm-cb-lbl">تفاصيل الطلب</div>
-          <div class="prm-cb-val" id="prmPayMethod">—</div>
-          <div class="prm-cb-sub" id="prmCashier"></div>
-        </div>
+      <table class="mb-tbl">
+        <thead><tr><th class="c-sr">Sr</th><th>Items</th><th class="c-n">Price</th><th class="c-n">Quantity</th><th class="c-n">Amount</th></tr></thead>
+        <tbody id="invPrintRows"></tbody>
+        <tfoot><tr><td></td><td></td><td></td><td class="c-n" id="prmTotQty"></td><td class="c-n" id="prmSubTotal"></td></tr></tfoot>
+      </table>
+      <div class="mb-sum">
+        <div class="mb-sum-r" id="prmDiscRow"><span>Discount</span><span id="prmDiscVal"></span></div>
+        <div class="mb-sum-r" id="prmDepRow"><span>Deposit</span><span id="prmDepVal"></span></div>
+        <div class="mb-sum-r" id="prmRemRow"><span>Remaining</span><span id="prmRemVal"></span></div>
+        <div class="mb-total"><span>TOTAL</span><span>EGP <span id="invPrintTotal"></span></span></div>
       </div>
-      <!-- البنود -->
-      <div class="prm-items">
-        <div class="prm-sec-title">📦 بنود الفاتورة</div>
-        <table class="prm-tbl">
-          <thead>
-            <tr style="background-color:#1e293b !important">
-              <th style="width:22px;text-align:center;background:#1e293b;color:#fff">#</th>
-              <th style="background:#1e293b;color:#fff">المنتج</th>
-              <th style="width:60px;text-align:center;background:#1e293b;color:#fff">الكمية</th>
-              <th style="width:90px;text-align:center;background:#1e293b;color:#fff">سعر الوحدة</th>
-              <th style="width:90px;background:#1e293b;color:#fff">الإجمالي</th>
-            </tr>
-          </thead>
-          <tbody id="invPrintRows"></tbody>
-        </table>
-        <!-- ملخص الدُسَت -->
-        <div id="prmDozSummary" style="display:none;margin:6px 0 2px;padding:7px 12px;background:linear-gradient(90deg,#eef2ff,#f5f3ff);border-radius:8px;border:1px solid #c7d2fe;font-size:11px;font-weight:900;color:#4338ca;text-align:left;letter-spacing:.3px"></div>
+      <div class="mb-rem">
+        <div class="mb-rem-h">Remarks</div>
+        <div class="mb-rem-t" id="prmPolicy" dir="auto"></div>
+        <div class="mb-rem-t" id="prmNoteTxt" dir="auto"></div>
       </div>
-      <!-- الإجمالي وحالة الدفع -->
-      <div class="prm-bottom">
-        <div class="prm-pay-col">
-          <div class="prm-pay-col-title">حالة الدفع</div>
-          <div id="prmPayCards"></div>
+      <div class="mb-bottom">
+        <div class="mb-codes" id="prmQrNotes">
+          <div id="prmQrBox"><div id="prmQrCanvas" style="width:52px;height:52px"></div></div>
+          <div class="prm-bc-wrap" id="prmBcWrap"><svg id="prmBcSvg" height="30" width="100%" viewBox="0 0 400 30" preserveAspectRatio="none"></svg><div class="prm-bc-num" id="prmBcNum"></div></div>
         </div>
-        <div class="prm-tot-col">
-          <div class="prm-tot-row"><span class="trl">المجموع الفرعي</span><span class="trv" id="prmSubTotal">—</span></div>
-          <div class="prm-tot-row disc" id="prmDiscRow"><span class="trl">🏷️ الخصم</span><span class="trv" id="prmDiscVal">—</span></div>
-          <div class="prm-tot-row" id="prmDepRow"><span class="trl">📲 العربون</span><span class="trv" id="prmDepVal">—</span></div>
-          <div class="prm-tot-row" id="prmRemRow" style="display:none"><span class="trl">🚚 الباقي</span><span class="trv" id="prmRemVal">—</span></div>
-          <div class="prm-tot-grand">
-            <span class="tgl">💰 الإجمالي النهائي</span>
-            <span class="tgv"><small>ج.م</small><span id="invPrintTotal">—</span></span>
-          </div>
-        </div>
+        <div class="mb-sig"><div id="prmSigName" dir="auto">Tmima Shoes</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div>
       </div>
-      <!-- QR + ملاحظات + توقيع -->
-      <div class="prm-qrnotes" id="prmQrNotes">
-        <div style="display:flex;align-items:center;gap:8px" id="prmQrBox">
-          <div id="prmQrCanvas" style="width:52px;height:52px;border-radius:9px;overflow:hidden;background:#f1f5f9;border:2px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8"></div>
-          <div class="prm-qr-txt">QR التحقق<br>امسح للتأكيد</div>
-        </div>
-        <div class="prm-bc-wrap" id="prmBcWrap">
-          <svg id="prmBcSvg" height="30" width="100%" viewBox="0 0 400 30" preserveAspectRatio="none"></svg>
-          <div class="prm-bc-num" id="prmBcNum"></div>
-        </div>
-        <div class="prm-note-box" id="prmNoteBox">
-          <div class="prm-note-lbl" id="prmNoteLbl" style="display:none">📝 ملاحظات</div>
-          <div class="prm-note-txt" id="prmNoteTxt"></div>
-        </div>
-        <div class="prm-sig">
-          <div class="prm-sig-line"></div>
-          <div class="prm-sig-lbl" id="prmSigName">توقيع المسؤول</div>
-        </div>
-      </div>
-      <!-- فوتر -->
-      <div class="prm-foot" id="prmFoot">
-        <div>
-          <div class="prm-foot-pol-title">📋 سياسة الاسترجاع</div>
-          <ul class="prm-foot-pol-list" id="prmPolicy"></ul>
-        </div>
-        <div class="prm-foot-mid">
-          <div class="prm-foot-thanks">شكراً لثقتك بنا 🙏</div>
-          <div class="prm-foot-sub" id="prmFootNote"></div>
-        </div>
-        <div>
-          <ul class="prm-foot-contacts" id="prmFootContacts"></ul>
-        </div>
-      </div>
+      <div class="mb-tag" id="prmTag" dir="auto"></div>
+      <div class="mb-wm" id="prmWm"></div>
     </div><!-- end prm-sheet -->
     <!-- أزرار -->
     <div class="inv-print-actions" style="flex-wrap:wrap;align-items:center">
@@ -24997,6 +24971,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     invUI.detailId = inv2.id;
     invShow("detail");
     invRenderDetail();
+    try { printInvoice(inv2.id); } catch (e) { console.error(e); }
   }
   function invNewFromCust() {
     const { map } = invGroups();
@@ -25363,7 +25338,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     setVal("st_inv_prefix", s.invPrefix || "INV");
     setVal("st_inv_note", s.invNote || "");
     setVal("st_sig_name", s.sigName || "");
-    setVal("st_return_policy", s.returnPolicy || "");
+    setVal("st_return_policy", (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY);
     const qr = document.getElementById("st_show_qr");
     const bc = document.getElementById("st_show_barcode");
     if (qr) qr.checked = !!s.showQr;
@@ -25518,6 +25493,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       x += w * 7;
     });
   }
+  var DEFAULT_RETURN_POLICY = "\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u0628\u062F\u0627\u0644 \u0648\u0627\u0644\u0627\u0633\u062A\u0631\u062C\u0627\u0639: \u0627\u0644\u0627\u0633\u062A\u0631\u062C\u0627\u0639 \u0641\u064A \u062E\u0644\u0627\u0644 3 \u0623\u064A\u0627\u0645 \u0641\u0642\u0637 \u0648\u0627\u0644\u0627\u0633\u062A\u0628\u062F\u0627\u0644 \u0641\u064A \u062E\u0644\u0627\u0644 14 \u064A\u0648\u0645\u060C \u0648\u0641\u064A \u062D\u0627\u0644\u0629 \u0623\u0646 \u0627\u0644\u0645\u0646\u062A\u062C \u0644\u0627 \u064A\u0648\u062C\u062F \u0628\u0647 \u0639\u064A\u0628. \u0627\u0644\u0634\u0631\u0643\u0629 \u063A\u064A\u0631 \u0645\u0633\u0624\u0648\u0644\u0629 \u0639\u0646 \u0645\u0635\u0627\u0631\u064A\u0641 \u0627\u0644\u0634\u062D\u0646.";
   function printInvoice(id) {
     const inv2 = invoices.find((x) => x.id === id);
     if (!inv2 || !invMine(inv2)) return;
@@ -25528,135 +25504,73 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const color = s.color || "#1e3a5f";
     const grad = `linear-gradient(135deg,${color},${shiftColor(color, 30)})`;
     const rainbow = `linear-gradient(90deg,${color},${shiftColor(color, 30)},#ec4899,#f59e0b,#10b981)`;
-    const hd = document.getElementById("prmHd");
-    if (hd) hd.style.background = grad;
-    document.getElementById("prmRainbow").style.background = rainbow;
     const logoBox = document.getElementById("prmCoLogo");
     if (logoBox) {
-      if (s.logoData) {
-        logoBox.innerHTML = `<img src="${s.logoData}" style="width:100%;height:100%;object-fit:${s.logoData === TAMIMA_LOGO ? "contain" : "cover"};border-radius:10px">`;
-      } else {
-        logoBox.textContent = s.emoji || "\u{1F3EA}";
-      }
+      if (s.logoData) logoBox.innerHTML = `<img src="${s.logoData}">`;
+      else logoBox.textContent = s.emoji || "\u{1F3EA}";
     }
-    document.getElementById("prmCoName").textContent = s.nameAr || "\u0645\u062A\u062C\u0631\u0643";
-    document.getElementById("prmCoNameEn").textContent = (s.nameEn || "").toUpperCase();
+    document.getElementById("prmCoName").textContent = s.nameAr || "Tmima Shoes";
+    document.getElementById("prmCoNameEn").textContent = s.nameEn || "";
     let contacts = "";
-    if (s.phone1) {
-      let ph = s.phone1;
-      if (s.phone2) ph += " | " + s.phone2;
-      contacts += `<span>\u{1F4DE} ${esc3(ph)}</span>`;
-    }
-    if (s.address) contacts += `<span>\u{1F4CD} ${esc3(s.address)}</span>`;
-    if (s.website) contacts += `<span>\u{1F310} ${esc3(s.website)}</span>`;
-    if (s.email) contacts += `<span>\u2709\uFE0F ${esc3(s.email)}</span>`;
+    if (s.address) contacts += `<span dir="auto">${esc3(s.address)}</span>`;
+    if (s.phone1) contacts += `<span><b>Contact:</b> ${esc3(s.phone1 + (s.phone2 ? " | " + s.phone2 : ""))}</span>`;
+    if (s.website) contacts += `<span>${esc3(s.website)}</span>`;
+    if (s.email) contacts += `<span>${esc3(s.email)}</span>`;
     document.getElementById("prmCoContacts").innerHTML = contacts;
     const prefix = s.invPrefix || "INV";
-    document.getElementById("prmInvNum").childNodes[0].textContent = `#${prefix}-${String(inv2.num || id).padStart(4, "0")} `;
-    document.getElementById("prmInvYear").textContent = new Date(inv2.date || Date.now()).getFullYear();
-    document.getElementById("prmInvDate").textContent = "\u{1F4C5} " + arDate(inv2.date) + (inv2.cashierName ? "  |  \u{1F9D1}\u200D\u{1F4BC} " + esc3(inv2.cashierName) : "");
-    const statusEl = document.getElementById("prmInvStatus");
-    statusEl.className = "prm-badge-status";
-    if (inv2.payStatus === "debt") {
-      statusEl.classList.add("debt");
-      statusEl.textContent = "\u23F3 \u0622\u062C\u0644";
-    } else if (inv2.payStatus === "part") {
-      statusEl.classList.add("part");
-      statusEl.textContent = "\u{1F4B0} \u062F\u0641\u0639 \u062C\u0632\u0626\u064A";
-    } else {
-      statusEl.classList.add("paid");
-      statusEl.textContent = "\u2705 \u0645\u062F\u0641\u0648\u0639\u0629 \u0628\u0627\u0644\u0643\u0627\u0645\u0644";
-    }
+    const numTxt = `${prefix}-${String(inv2.num || id).padStart(4, "0")}`;
+    document.getElementById("prmInvNum").textContent = numTxt;
+    const dd = inv2.date ? new Date(inv2.date) : new Date();
+    const ddTxt = isNaN(dd) ? (inv2.date || "") : String(dd.getDate()).padStart(2, "0") + "-" + String(dd.getMonth() + 1).padStart(2, "0") + "-" + dd.getFullYear();
+    document.getElementById("prmInvDate").textContent = ddTxt;
+    document.getElementById("prmDueDate").textContent = ddTxt;
     document.getElementById("prmCliName").textContent = inv2.client || "\u2014";
-    document.getElementById("prmCliPhone").textContent = inv2.clientPhone ? "\u{1F4DE} " + esc3(inv2.clientPhone) : "";
-    document.getElementById("prmCliAddr").textContent = inv2.clientAddress || "\u2014";
+    document.getElementById("prmCliPhone").textContent = inv2.clientPhone || "";
+    document.getElementById("prmCliAddr").textContent = inv2.clientAddress || "";
     document.getElementById("prmPayMethod").textContent = inv2.payStatus === "debt" ? "\u0622\u062C\u0644" : inv2.payStatus === "part" ? "\u062F\u0641\u0639 \u062C\u0632\u0626\u064A" : "\u0643\u0627\u0634";
-    document.getElementById("prmCashier").textContent = inv2.cashierName ? "\u{1F9D1}\u200D\u{1F4BC} " + esc3(inv2.cashierName) : "";
+    document.getElementById("prmCashier").textContent = inv2.cashierName || "";
+    document.getElementById("prmCashierRow").style.display = inv2.cashierName ? "" : "none";
+    const nf = (n) => (Number(n) || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById("invPrintRows").innerHTML = inv2.items.map((item, i) => `
-    <tr>
-      <td style="color:#94a3b8;font-size:10px;text-align:center">${i + 1}</td>
-      <td><span style="font-weight:800;color:#0f172a">${esc3(item.prodName)}</span></td>
-      <td style="text-align:center;font-weight:900;color:#0f172a">${item.qty || 0}</td>
-      <td style="text-align:center;color:#475569">${fmt(item.price)} \u062C</td>
-      <td>${fmt(item.total)} \u062C</td>
-    </tr>`).join("");
+    <tr><td>${i + 1}</td><td dir="auto">${esc3(item.prodName)}</td><td class="c-n">${nf(item.price)}</td><td class="c-n">${nf(item.qty)}</td><td class="c-n">${nf(item.total)}</td></tr>`).join("");
     const sub = inv2.items.reduce((s2, it) => s2 + it.total, 0);
     const grandShown = Number(inv2.grandTotal) || sub;
     let disc = parseFloat(inv2.discount) || 0;
     if (!(disc > 0) && sub > grandShown + 5e-3) disc = +(sub - grandShown).toFixed(2);
-    document.getElementById("prmSubTotal").textContent = fmt(sub) + " \u062C";
-    document.getElementById("invPrintTotal").textContent = fmt(grandShown);
-    const discVal = document.getElementById("prmDiscVal");
-    if (discVal) discVal.textContent = disc > 0 ? "- " + fmt(disc) + " \u062C" : "0 \u062C";
+    document.getElementById("prmTotQty").textContent = nf(inv2.items.reduce((s2, it) => s2 + (parseFloat(it.qty) || 0), 0));
+    document.getElementById("prmSubTotal").textContent = nf(sub);
+    document.getElementById("invPrintTotal").textContent = nf(grandShown);
     const isPart = inv2.payStatus === "part";
-    const depVal = document.getElementById("prmDepVal");
-    if (depVal) depVal.textContent = isPart && Number(inv2.paidAmount) > 0 ? fmt(inv2.paidAmount) + " \u062C" + (inv2.depositMethod ? " (" + inv2.depositMethod + ")" : "") : "0 \u062C";
-    const remRow = document.getElementById("prmRemRow");
-    if (remRow) {
-      remRow.style.display = isPart ? "" : "none";
-      const remVal = document.getElementById("prmRemVal");
-      if (remVal) remVal.textContent = fmt(inv2.debtAmount || 0) + " \u062C";
-    }
-    const totalDoz = inv2.items.reduce((s2, it) => s2 + (parseFloat(it.qty) || 0), 0);
-    const dozDisplay = Number.isInteger(totalDoz) ? totalDoz : +totalDoz.toFixed(2);
-    const dozSummaryEl = document.getElementById("prmDozSummary");
-    if (dozSummaryEl) {
-      dozSummaryEl.innerHTML = `\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u062F\u064F\u0633\u064E\u062A: <span style="font-size:20px;font-weight:900;color:#4f46e5;margin:0 4px">${dozDisplay}</span> \u062F\u0633\u062A\u0647`;
-      dozSummaryEl.style.display = "";
-    }
-    let payCards = "";
-    if (inv2.payStatus === "part") {
-      payCards = `
-      <div class="prm-pay-card part"><span class="pci">\u{1F4B0}</span><div><div class="pcl">\u0639\u0631\u0628\u0648\u0646 \u0645\u062F\u0641\u0648\u0639${inv2.depositMethod ? " (" + esc3(inv2.depositMethod) + ")" : ""}</div><div class="pcv">${fmt(inv2.paidAmount || 0)} \u062C.\u0645</div></div></div>
-      <div class="prm-pay-card debt"><span class="pci">\u{1F69A}</span><div><div class="pcl">\u0627\u0644\u0628\u0627\u0642\u064A \u0645\u0639 \u0634\u0631\u0643\u0629 \u0627\u0644\u0634\u062D\u0646</div><div class="pcv">${fmt(inv2.debtAmount || 0)} \u062C.\u0645</div></div></div>`;
-    } else if (inv2.payStatus === "debt") {
-      payCards = `<div class="prm-pay-card debt"><span class="pci">\u23F3</span><div><div class="pcl">\u0622\u062C\u0644 \u2014 \u0627\u0644\u0645\u0628\u0644\u063A \u0643\u0627\u0645\u0644\u0627\u064B</div><div class="pcv">${fmt(inv2.grandTotal || sub)} \u062C.\u0645</div></div></div>`;
-    } else {
-      payCards = `<div class="prm-pay-card"><span class="pci">\u2705</span><div><div class="pcl">\u0645\u062F\u0641\u0648\u0639 \u0628\u0627\u0644\u0643\u0627\u0645\u0644</div><div class="pcv">${fmt(inv2.grandTotal || sub)} \u062C.\u0645</div></div></div>`;
-    }
-    document.getElementById("prmPayCards").innerHTML = payCards;
-    const noteText = inv2.notes || s.invNote || "";
-    document.getElementById("prmNoteTxt").textContent = noteText;
-    const noteLbl = document.getElementById("prmNoteLbl");
-    if (noteLbl) noteLbl.style.display = noteText ? "" : "none";
-    const sigEl = document.getElementById("prmSigName");
-    if (sigEl) sigEl.textContent = s.sigName || "\u062A\u0648\u0642\u064A\u0639 \u0627\u0644\u0645\u0633\u0624\u0648\u0644";
+    const rowShow = (rid, vid, on, txt) => { const r = document.getElementById(rid); if (r) r.style.display = on ? "" : "none"; const v = document.getElementById(vid); if (v && on) v.textContent = txt; };
+    rowShow("prmDiscRow", "prmDiscVal", disc > 0, "- " + nf(disc));
+    rowShow("prmDepRow", "prmDepVal", isPart && Number(inv2.paidAmount) > 0, nf(inv2.paidAmount) + (inv2.depositMethod ? " (" + inv2.depositMethod + ")" : ""));
+    rowShow("prmRemRow", "prmRemVal", isPart, nf(inv2.debtAmount || 0));
+    document.getElementById("prmNoteTxt").textContent = inv2.notes || "";
+    document.getElementById("prmPolicy").textContent = (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY;
+    const wm = document.getElementById("prmWm");
+    if (wm) wm.style.backgroundImage = s.logoData ? `url("${s.logoData}")` : "none";
+    const tg = document.getElementById("prmTag");
+    if (tg) tg.textContent = (s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644";
+    document.getElementById("prmSigName").textContent = s.sigName || "Tmima Shoes";
     const bcWrap = document.getElementById("prmBcWrap");
     const qrBox = document.getElementById("prmQrBox");
     if (bcWrap) bcWrap.style.display = s.showBarcode !== false ? "" : "none";
     if (s.showBarcode !== false) {
       buildBarcode("prmBcSvg");
-      document.getElementById("prmBcNum").textContent = `${prefix}-${String(inv2.num || id).padStart(4, "0")} \xB7 ${inv2.date || ""}`;
+      document.getElementById("prmBcNum").textContent = `${numTxt} \xB7 ${inv2.date || ""}`;
     }
     if (qrBox) qrBox.style.display = s.showQr ? "" : "none";
     if (s.showQr) {
       const qrCanvas = document.getElementById("prmQrCanvas");
       if (qrCanvas) {
         qrCanvas.innerHTML = "";
-        const qrData = `${prefix}-${String(inv2.num || id).padStart(4, "0")}|${inv2.date || ""}|${fmt(inv2.grandTotal || 0)}`;
         try {
-          new QRCode(qrCanvas, { text: qrData, width: 48, height: 48, colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+          new QRCode(qrCanvas, { text: `${numTxt}|${inv2.date || ""}|${fmt(inv2.grandTotal || 0)}`, width: 52, height: 52, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
         } catch (e) {
           qrCanvas.textContent = "QR";
         }
       }
     }
-    const policyEl = document.getElementById("prmPolicy");
-    if (policyEl) {
-      const lines = (s.returnPolicy || "").split("\n").filter((l) => l.trim());
-      policyEl.innerHTML = lines.map((l) => `<li>${esc3(l.trim())}</li>`).join("");
-    }
-    document.getElementById("prmFootNote").textContent = s.invNote || "";
-    const footContacts = document.getElementById("prmFootContacts");
-    if (footContacts) {
-      let fc = "";
-      if (s.phone1) fc += `<li>\u{1F4DE} ${esc3(s.phone1)}</li>`;
-      if (s.website) fc += `<li>\u{1F310} ${esc3(s.website)}</li>`;
-      if (s.email) fc += `<li>\u2709\uFE0F ${esc3(s.email)}</li>`;
-      footContacts.innerHTML = fc;
-    }
-    const prmFoot = document.getElementById("prmFoot");
-    if (prmFoot) prmFoot.style.background = grad;
     document.getElementById("invPrintModal").classList.add("open");
   }
   function closeInvPrint() {
