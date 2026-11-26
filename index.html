@@ -1177,6 +1177,8 @@ tbody tr:last-child td{border-bottom:none}
 .mb-tbl .c-n{text-align:right;white-space:nowrap}.mb-tbl .c-sr{width:30px}
 .mb-tbl tbody td:nth-child(2){width:99%;word-break:break-word}
 .mb-tbl tfoot td{font-weight:600}
+.mb-stamp{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) rotate(-22deg);font:900 90px/1 Arial,Helvetica,sans-serif;letter-spacing:8px;color:rgba(22,163,74,.28);border:8px solid rgba(22,163,74,.28);border-radius:14px;padding:6px 26px;pointer-events:none;z-index:3;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.mb-paidline{font-weight:600}
 .mb-sum{display:flex;flex-direction:column;align-items:flex-end;margin:8px 14px 0;gap:2px;font-size:12px}
 .mb-sum-r{display:flex;justify-content:space-between;gap:30px;min-width:200px;padding:0 10px}
 .mb-total{display:flex;justify-content:space-between;gap:30px;background:#e5e5e5;font-weight:700;font-size:15px;padding:5px 10px;min-width:260px}
@@ -6248,8 +6250,9 @@ img,video,canvas,svg{max-width:100%}
       <div class="mb-sum">
         <div class="mb-sum-r" id="prmDiscRow"><span>Discount</span><span id="prmDiscVal"></span></div>
         <div class="mb-sum-r" id="prmDepRow"><span>Deposit</span><span id="prmDepVal"></span></div>
-        <div class="mb-sum-r" id="prmRemRow"><span>Remaining</span><span id="prmRemVal"></span></div>
         <div class="mb-total"><span>TOTAL</span><span>EGP <span id="invPrintTotal"></span></span></div>
+        <div class="mb-sum-r mb-paidline" id="prmPaidRow"><span>Amount Paid</span><span id="prmPaidVal"></span></div>
+        <div class="mb-sum-r mb-paidline" id="prmRemRow"><span>Balance</span><span id="prmRemVal"></span></div>
       </div>
       <div class="mb-rem">
         <div class="mb-rem-h">Remarks</div>
@@ -24945,14 +24948,13 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         <tfoot><tr><td></td><td></td><td></td><td class="c-n">${nf(q)}</td><td class="c-n">${nf(sub)}</td></tr></tfoot></table>
       <div class="mb-sum">
         ${disc > 0 ? `<div class="mb-sum-r"><span>Discount</span><span>- ${nf(disc)}</span></div>` : ""}
-        ${paid > 0 && invPayStatus !== "paid" ? `<div class="mb-sum-r"><span>Paid</span><span>${nf(paid)}</span></div>` : ""}
-        ${rest > 0 ? `<div class="mb-sum-r"><span>Remaining</span><span>${nf(rest)}</span></div>` : ""}
-        <div class="mb-total"><span>TOTAL</span><span>EGP ${nf(grand)}</span></div>
+                        <div class="mb-total"><span>TOTAL</span><span>EGP ${nf(grand)}</span></div>
+        <div class="mb-sum-r mb-paidline"><span>Amount Paid</span><span>${nf(paid)}</span></div><div class="mb-sum-r mb-paidline"><span>Balance</span><span>${nf(rest)}</span></div>
       </div>
       <div class="mb-rem"><div class="mb-rem-h">Remarks</div><div class="mb-rem-t" dir="auto">${esc3(policy)}</div>${notes ? `<div class="mb-rem-t" dir="auto">${esc3(notes)}</div>` : ""}</div>
       <div class="mb-bottom"><div class="mb-codes"></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
       <div class="mb-tag" dir="auto">${esc3((s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644")}</div>
-      <div class="mb-wm" style="background-image:${s.logoData ? `url('${s.logoData}')` : "none"}"></div>`;
+      <div class="mb-wm" style="background-image:${s.logoData ? `url('${s.logoData}')` : "none"}"></div>${grand > 0 && rest <= 0.004 ? `<div class="mb-stamp">PAID</div>` : ""}`;
   }
   (function lvInit() {
     const view = document.getElementById("invCreateView");
@@ -25732,8 +25734,16 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const isPart = inv2.payStatus === "part";
     const rowShow = (rid, vid, on, txt) => { const r = document.getElementById(rid); if (r) r.style.display = on ? "" : "none"; const v = document.getElementById(vid); if (v && on) v.textContent = txt; };
     rowShow("prmDiscRow", "prmDiscVal", disc > 0, "- " + nf(disc));
-    rowShow("prmDepRow", "prmDepVal", isPart && Number(inv2.paidAmount) > 0, nf(inv2.paidAmount) + (inv2.depositMethod ? " (" + inv2.depositMethod + ")" : ""));
-    rowShow("prmRemRow", "prmRemVal", isPart, nf(inv2.debtAmount || 0));
+    rowShow("prmDepRow", "prmDepVal", false, "");
+    const paidNow = inv2.payStatus === "paid" ? grandShown : (isPart ? Math.min(Number(inv2.paidAmount) || 0, grandShown) : 0);
+    rowShow("prmPaidRow", "prmPaidVal", true, nf(paidNow));
+    rowShow("prmRemRow", "prmRemVal", true, nf(Math.max(0, grandShown - paidNow)));
+    document.querySelectorAll("#prmSheet .mb-stamp, .prm-sheet .mb-stamp").forEach((x) => x.remove());
+    if (grandShown > 0 && paidNow >= grandShown - 0.004) {
+      const sh0 = document.querySelector("#invPrintModal .prm-sheet");
+      if (sh0) { const st = document.createElement("div"); st.className = "mb-stamp"; st.textContent = "PAID"; sh0.appendChild(st); }
+    }
+    
     document.getElementById("prmNoteTxt").textContent = inv2.notes || "";
     document.getElementById("prmPolicy").textContent = (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY;
     const wm = document.getElementById("prmWm");
@@ -25919,13 +25929,18 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         z.style.zoom=''; z.style.width=((pw-2*m)/K)+'mm';
         z.style.zoom=String(K);
         if(ph){
-          var h=z.getBoundingClientRect().height*25.4/96;
+          var nr=document.querySelectorAll('.mb-tbl tbody tr').length;
+          var cp=nr>26?'0px 5px':nr>14?'1px 5px':'';
+          document.querySelectorAll('.mb-tbl tbody td').forEach(function(td){ td.style.padding=cp; td.style.lineHeight=nr>26?'1.15':nr>14?'1.25':''; });
+          var h=z.offsetHeight*K*25.4/96;
           var avail=ph-2*m-2;
           if(h>avail) z.style.zoom=String(Math.floor(K*avail/h*100)/100);
         }
         try{ localStorage.setItem('tm_inv_paper4',p); }catch(e){}
       }
       pp.addEventListener('change',apply);
+      window.addEventListener('load',apply); window.addEventListener('beforeprint',apply);
+      if(document.fonts&&document.fonts.ready) document.fonts.ready.then(apply);
       document.getElementById('prPrintBtn').addEventListener('click',function(){ window.print(); });
       document.getElementById('prCloseBtn').addEventListener('click',function(){ window.close(); });
       apply();
