@@ -1192,6 +1192,43 @@ tbody tr:last-child td{border-bottom:none}
 .mb-sigline{border-bottom:1px solid #555;height:26px;margin-top:4px}
 @media (max-width:520px){.mb-co{gap:8px}.mb-logo{width:56px;height:46px}.mb-coname{font-size:17px}.mb-cocontact{max-width:100%;text-align:left}.mb-tbl{font-size:10.5px}}
 
+
+/* ── Live invoice preview in the create screen ── */
+.lv-box{margin:10px 12px}
+.lv-toggle{width:100%;background:#eef2f7;border:1px solid var(--border);border-radius:10px;padding:8px;font-family:inherit;font-size:13px;font-weight:800;color:#334155;cursor:pointer;margin-bottom:8px}
+.lv-box.shut .lv-sheet{display:none}
+.lv-sheet{position:relative;direction:ltr;font-family:'Cairo',Arial,'Segoe UI',Tahoma,sans-serif;color:#111;background:#fff;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;padding-bottom:10px}
+.lv-sheet .mb-top{display:flex;align-items:center;background:#e5e5e5;font-size:13px;font-weight:700;padding:9px 14px;gap:14px}
+.lv-sheet .mb-tbl th{font-weight:600;background:#fff;color:#111;font-size:11.5px}
+.lv-empty{text-align:center;color:#94a3b8;font-size:11px;padding:8px}
+@media (min-width:1000px){
+  #invCreateView.lv-on{display:grid!important;grid-template-columns:minmax(0,1fr) 520px;column-gap:16px;align-items:start}
+  #invCreateView.lv-on .cw-head,#invCreateView.lv-on .cw-total{grid-column:1 / -1}
+  #invCreateView.lv-on .lv-box{grid-column:2;grid-row:3 / span 6;position:sticky;top:10px;margin:10px 0}
+  #invCreateView.lv-on .cw-card{grid-column:1;grid-row:3}
+  .lv-toggle{display:none}
+}
+
+
+.lv-actions{display:none}
+#invCreateView.lv-saved .cw-card,#invCreateView.lv-saved .cw-bar,#invCreateView.lv-saved .cw-total,#invCreateView.lv-saved .cw-stepno,#invCreateView.lv-saved .lv-toggle{display:none!important}
+#invCreateView.lv-saved .lv-box{grid-column:1 / -1!important;grid-row:auto!important;position:static!important;max-width:640px;width:100%;margin:10px auto!important}
+#invCreateView.lv-saved .lv-box.shut .lv-sheet{display:block}
+#invCreateView.lv-saved .lv-actions{display:flex;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;padding:10px 0 12px;z-index:5}
+.lv-b{flex:1;min-width:90px;border-radius:9px;padding:11px 12px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--ink-soft)}
+.lv-b-q{color:var(--blue);border-color:var(--blue)}
+.lv-b-p{background:linear-gradient(135deg,#2d5986,#1e3a5f);color:#fff;border:none;flex:2}
+.lv-b-n{background:#0d9488;color:#fff;border:none}
+#invCreateView.lv-saved .lv-sheet.prm-sheet,#invCreateView.lv-saved #lvSheet .prm-sheet{border:1px solid #cbd5e1;border-radius:10px}
+
+
+.lv-zoom{display:none;align-items:center;gap:10px;padding:6px 4px;direction:ltr}
+.lv-zoom input{flex:1;accent-color:#f97316}
+.lv-zoom b{min-width:42px;font-size:12px;color:#475569;text-align:right}
+.lv-zoom-m{display:flex;width:100%;flex-basis:100%}
+#invCreateView.lv-saved .lv-box>.lv-zoom{display:flex}
+@media print{.lv-zoom{display:none!important}}
+
 /* ── @print — مهم للطباعة ── */
 @media print{
   #invPrintModal{display:flex!important;position:static!important;background:none!important;backdrop-filter:none!important;padding:0!important}
@@ -5482,6 +5519,12 @@ img,video,canvas,svg{max-width:100%}
     <div class="inv-form-card-inner cw-stepno" id="cwStepNo">1/4</div>
   </div>
   <div class="cw-total" id="cwTotalBar" style="display:none"><span>الإجمالي</span><b id="cwTotal">0.00 ج</b></div>
+  <div class="lv-box" id="lvBox">
+    <button type="button" class="lv-toggle" id="lvToggle">معاينة الفاتورة الحية ▾</button>
+    <div class="lv-sheet" id="lvSheet"></div>
+    <div class="lv-zoom"><span>🔍</span><input type="range" class="inv-scale" min="50" max="130" step="5" value="100" aria-label="تكبير / تصغير الفاتورة"><b class="inv-scale-v">100%</b></div>
+    <div class="lv-actions" id="lvActions"><button type="button" class="lv-b lv-b-x" id="lvClose">✕ إغلاق</button><button type="button" class="lv-b lv-b-q" id="lvQr">📲 QR</button><button type="button" class="lv-b lv-b-p" id="lvPrint">🖨️ طباعة / PDF</button><button type="button" class="lv-b lv-b-n" id="lvNew">➕ فاتورة جديدة</button></div>
+  </div>
   <div class="inv-form-card cw-card">
    <div class="inv-form-card-inner cw-step on" data-s="1">
     <div class="cw-h">بيانات العميل</div>
@@ -6230,6 +6273,7 @@ img,video,canvas,svg{max-width:100%}
     </div><!-- end prm-sheet -->
     <!-- أزرار -->
     <div class="inv-print-actions" style="flex-wrap:wrap;align-items:center">
+      <div class="lv-zoom lv-zoom-m"><span>🔍</span><input type="range" class="inv-scale" min="50" max="130" step="5" value="100" aria-label="تكبير / تصغير الفاتورة"><b class="inv-scale-v">100%</b></div>
       <button class="btn-close-print" data-h="s111">✕ إغلاق</button>
       <button class="btn-close-print" id="btnInvQr" data-h="s112" style="color:var(--blue);border-color:var(--blue)">📲 QR</button>
       <button class="btn-do-print" data-h="s113">🖨️ طباعة / PDF</button>
@@ -24431,6 +24475,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     document.getElementById("invGrandTotal").textContent = fmt(grand) + " \u062C";
     const cwT = document.getElementById("cwTotal");
     if (cwT) cwT.textContent = fmt(grand) + " \u062C";
+    try { lvSchedule(); } catch (e) {}
   }
   function showAvailableBadge(rowId, available) {
     const row = document.getElementById(rowId);
@@ -24855,6 +24900,146 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     });
     return out;
   }
+
+  // ===== live classic-invoice preview on the create screen =====
+  var _lvT = 0;
+  function lvSchedule() {
+    clearTimeout(_lvT);
+    _lvT = setTimeout(lvRender, 60);
+  }
+  function lvRender() {
+    const box = document.getElementById("lvSheet");
+    const view = document.getElementById("invCreateView");
+    if (!box || !view || view.style.display === "none" || view.classList.contains("lv-saved")) return;
+    const s = getStoreSettings();
+    const nf = (n) => (Number(n) || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const items = cwItems();
+    const sub = items.reduce((a, i) => a + i.total, 0);
+    const disc = Math.max(0, parseFloat(document.getElementById("invDiscount")?.value) || 0);
+    const grand = Math.max(0, sub - disc);
+    const client = document.getElementById("invClient").value.trim() || "\u0639\u0645\u064A\u0644 \u0646\u0642\u062F\u064A";
+    const phone = (document.getElementById("invClientPhone")?.textContent || "").trim();
+    const addr = (document.getElementById("invClientAddress")?.textContent || "").trim();
+    const dv = document.getElementById("invDate")?.value || todayStr();
+    const dd = new Date(dv);
+    const dtxt = isNaN(dd) ? dv : String(dd.getDate()).padStart(2, "0") + "-" + String(dd.getMonth() + 1).padStart(2, "0") + "-" + dd.getFullYear();
+    const numRaw = (document.getElementById("invHeroNum")?.textContent || "").replace("#", "").trim();
+    const numTxt = (s.invPrefix || "INV") + "-" + (numRaw && numRaw !== "\u2014" ? numRaw : "----");
+    const notes = (document.getElementById("invNotes")?.value || "").trim();
+    let paid = 0, payTxt;
+    if (invPayStatus === "paid") { paid = grand; payTxt = "\u0643\u0627\u0634"; }
+    else if (invPayStatus === "debt") payTxt = "\u0622\u062C\u0644";
+    else if (invPayStatus === "ship") payTxt = "\u0645\u0639 \u0634\u0631\u0643\u0629 \u0627\u0644\u0634\u062D\u0646";
+    else {
+      paid = Math.min((parseFloat(document.getElementById("invPaidAmount")?.value) || 0) + (parseFloat(document.getElementById("invDepositCash")?.value) || 0), grand);
+      payTxt = "\u062F\u0641\u0639 \u062C\u0632\u0626\u064A";
+    }
+    const rest = Math.max(0, grand - paid);
+    let contacts = "";
+    if (s.address) contacts += `<span dir="auto">${esc3(s.address)}</span>`;
+    if (s.phone1) contacts += `<span><b>Contact:</b> ${esc3(s.phone1 + (s.phone2 ? " | " + s.phone2 : ""))}</span>`;
+    const rows = items.map((it, i) => `<tr><td>${i + 1}</td><td dir="auto">${esc3(it.name)}</td><td class="c-n">${nf(it.price)}</td><td class="c-n">${nf(it.qty)}</td><td class="c-n">${nf(it.total)}</td></tr>`).join("") || `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>`;
+    const q = items.reduce((a, i) => a + i.qty, 0);
+    const policy = (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY;
+    box.innerHTML = `
+      <div class="mb-top"><span class="mb-top-l">INVOICE</span><span class="mb-top-n">${esc3(numTxt)}</span><span class="mb-top-d">${dtxt}</span></div>
+      <div class="mb-co"><div class="mb-logo">${s.logoData ? `<img src="${s.logoData}">` : ""}</div><div class="mb-coname"><div>${esc3(s.nameAr || "Tmima Shoes")}</div></div><div class="mb-cocontact">${contacts}</div></div>
+      <div class="mb-to"><div class="mb-to-l"><div class="mb-lbl">TO,</div><div class="mb-cli" dir="auto">${esc3(client)}</div>${addr ? `<div class="mb-cli-s" dir="auto">${esc3(addr)}</div>` : ""}${phone ? `<div class="mb-cli-s">${esc3(phone)}</div>` : ""}</div>
+        <div class="mb-to-r"><div><span class="mb-k">Date:</span> ${dtxt}</div><div><span class="mb-k">Payment:</span> ${payTxt}</div></div></div>
+      <table class="mb-tbl"><thead><tr><th class="c-sr">Sr</th><th>Items</th><th class="c-n">Price</th><th class="c-n">Quantity</th><th class="c-n">Amount</th></tr></thead><tbody>${rows}</tbody>
+        <tfoot><tr><td></td><td></td><td></td><td class="c-n">${nf(q)}</td><td class="c-n">${nf(sub)}</td></tr></tfoot></table>
+      <div class="mb-sum">
+        ${disc > 0 ? `<div class="mb-sum-r"><span>Discount</span><span>- ${nf(disc)}</span></div>` : ""}
+        ${paid > 0 && invPayStatus !== "paid" ? `<div class="mb-sum-r"><span>Paid</span><span>${nf(paid)}</span></div>` : ""}
+        ${rest > 0 ? `<div class="mb-sum-r"><span>Remaining</span><span>${nf(rest)}</span></div>` : ""}
+        <div class="mb-total"><span>TOTAL</span><span>EGP ${nf(grand)}</span></div>
+      </div>
+      <div class="mb-rem"><div class="mb-rem-h">Remarks</div><div class="mb-rem-t" dir="auto">${esc3(policy)}</div>${notes ? `<div class="mb-rem-t" dir="auto">${esc3(notes)}</div>` : ""}</div>
+      <div class="mb-bottom"><div class="mb-codes"></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
+      <div class="mb-tag" dir="auto">${esc3((s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644")}</div>
+      <div class="mb-wm" style="background-image:${s.logoData ? `url('${s.logoData}')` : "none"}"></div>`;
+  }
+  (function lvInit() {
+    const view = document.getElementById("invCreateView");
+    if (!view) return;
+    view.classList.add("lv-on");
+    ["input", "change", "click", "keyup"].forEach((ev) => view.addEventListener(ev, lvSchedule, true));
+    const tg = document.getElementById("lvToggle");
+    if (tg) tg.addEventListener("click", () => document.getElementById("lvBox").classList.toggle("shut"));
+    try {
+      const mo = new MutationObserver(lvSchedule);
+      ["invRows", "invClientPhone", "invClientAddress", "invHeroNum"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) mo.observe(el, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["data-prod-id", "value"] });
+      });
+      mo.observe(view, { attributes: true, attributeFilter: ["style"] });
+    } catch (e) {}
+  })();
+
+
+  // ===== invoice scale slider (post-save page + old-invoice modal), carried into print/PDF =====
+  function getInvScale() {
+    let v = 100;
+    try { v = parseInt(localStorage.getItem("tm_inv_scale")) || 100; } catch (e) {}
+    return Math.min(130, Math.max(50, v));
+  }
+  function applyInvScale(v) {
+    v = Math.min(130, Math.max(50, parseInt(v) || 100));
+    const k = v / 100;
+    const sh = document.querySelector(".prm-sheet");
+    if (sh) {
+      sh.style.zoom = k === 1 ? "" : String(k);
+      sh.style.margin = k === 1 ? "" : "0 auto";
+    }
+    document.querySelectorAll(".inv-scale").forEach((r) => { if (+r.value !== v) r.value = v; });
+    document.querySelectorAll(".inv-scale-v").forEach((b) => { b.textContent = v + "%"; });
+    try { localStorage.setItem("tm_inv_scale", String(v)); } catch (e) {}
+  }
+  document.addEventListener("input", (ev) => {
+    if (ev.target && ev.target.classList && ev.target.classList.contains("inv-scale")) applyInvScale(ev.target.value);
+  });
+  // ===== one-page flow: after save the same page shows the finished invoice =====
+  function lvRestoreSheet() {
+    const sh = document.querySelector("#lvSheet .prm-sheet");
+    if (!sh) return;
+    const box = document.querySelector("#invPrintModal .inv-print-box");
+    const act = box && box.querySelector(".inv-print-actions");
+    if (box) box.insertBefore(sh, act || null);
+  }
+  function lvEnterSaved(id) {
+    if (!fillPrintSheet(id)) return false;
+    const sh = document.querySelector("#invPrintModal .prm-sheet");
+    const host = document.getElementById("lvSheet");
+    if (!sh || !host) return false;
+    host.innerHTML = "";
+    host.classList.add("lv-final");
+    host.appendChild(sh);
+    applyInvScale(getInvScale());
+    const v = document.getElementById("invCreateView");
+    v.classList.add("lv-saved");
+    document.getElementById("lvBox").classList.remove("shut");
+    const t = v.querySelector(".cw-title");
+    if (t) { t.dataset.old = t.innerHTML; t.textContent = "\u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 " + (document.querySelector("#lvSheet .mb-top-n")?.textContent || ""); }
+    window.scrollTo({ top: 0 });
+    return true;
+  }
+  function lvExitSaved() {
+    const v = document.getElementById("invCreateView");
+    if (!v || !v.classList.contains("lv-saved")) return;
+    lvRestoreSheet();
+    v.classList.remove("lv-saved");
+    const tt = v.querySelector(".cw-title");
+    if (tt && tt.dataset.old) tt.innerHTML = tt.dataset.old;
+    const host = document.getElementById("lvSheet");
+    if (host) { host.classList.remove("lv-final"); host.innerHTML = ""; }
+  }
+  (function lvActionsInit() {
+    const on = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener("click", fn); };
+    on("lvPrint", () => printInvoiceOnly());
+    on("lvQr", () => showInvQr());
+    on("lvClose", () => cwCancel());
+    on("lvNew", () => { lvExitSaved(); invUI.view = "home"; invOpenCreate(); });
+  })();
   function cwSummaryHTML() {
     const items = cwItems();
     const sub = items.reduce((a, i) => a + i.total, 0);
@@ -24906,6 +25091,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     if (n === 4) document.getElementById("cwSummary").innerHTML = cwSummaryHTML();
     if (n === 3) updateRestLabel();
     window.scrollTo({ top: 0 });
+    lvSchedule();
   }
   function cwNext() {
     const n = invUI.step;
@@ -24960,6 +25146,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     updateInvTotal();
   }
   async function cwCancel() {
+    lvExitSaved();
     const dirty = cwItems().length || document.getElementById("invClient").value.trim() || document.getElementById("invNotes").value.trim();
     if (dirty && !confirm("\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629\u061F \u0627\u0644\u0644\u064A \u0627\u062A\u0643\u062A\u0628 \u0647\u064A\u062A\u0645\u0633\u062D.")) return;
     await invResetCreateForm();
@@ -24969,9 +25156,11 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   function invAfterSave(inv2) {
     cwGo(1);
     invUI.detailId = inv2.id;
+    try {
+      if (lvEnterSaved(inv2.id)) { currentPrintInvId = inv2.id; return; }
+    } catch (e) { console.error(e); }
     invShow("detail");
     invRenderDetail();
-    try { printInvoice(inv2.id); } catch (e) { console.error(e); }
   }
   function invNewFromCust() {
     const { map } = invGroups();
@@ -25495,8 +25684,12 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   var DEFAULT_RETURN_POLICY = "\u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u0627\u0633\u062A\u0628\u062F\u0627\u0644 \u0648\u0627\u0644\u0627\u0633\u062A\u0631\u062C\u0627\u0639: \u0627\u0644\u0627\u0633\u062A\u0631\u062C\u0627\u0639 \u0641\u064A \u062E\u0644\u0627\u0644 3 \u0623\u064A\u0627\u0645 \u0641\u0642\u0637 \u0648\u0627\u0644\u0627\u0633\u062A\u0628\u062F\u0627\u0644 \u0641\u064A \u062E\u0644\u0627\u0644 14 \u064A\u0648\u0645\u060C \u0648\u0641\u064A \u062D\u0627\u0644\u0629 \u0623\u0646 \u0627\u0644\u0645\u0646\u062A\u062C \u0644\u0627 \u064A\u0648\u062C\u062F \u0628\u0647 \u0639\u064A\u0628. \u0627\u0644\u0634\u0631\u0643\u0629 \u063A\u064A\u0631 \u0645\u0633\u0624\u0648\u0644\u0629 \u0639\u0646 \u0645\u0635\u0627\u0631\u064A\u0641 \u0627\u0644\u0634\u062D\u0646.";
   function printInvoice(id) {
+    lvRestoreSheet();
+    if (fillPrintSheet(id)) document.getElementById("invPrintModal").classList.add("open");
+  }
+  function fillPrintSheet(id) {
     const inv2 = invoices.find((x) => x.id === id);
-    if (!inv2 || !invMine(inv2)) return;
+    if (!inv2 || !invMine(inv2)) return false;
     currentPrintInvId = id;
     window.__invItemCount = (inv2.items || []).length;
     setTimeout(applyInvWidth, 0);
@@ -25571,7 +25764,8 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         }
       }
     }
-    document.getElementById("invPrintModal").classList.add("open");
+    applyInvScale(getInvScale());
+    return true;
   }
   function closeInvPrint() {
     document.getElementById("invPrintModal").classList.remove("open");
