@@ -49,7 +49,7 @@
   const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   if (!document.getElementById('pwa-manifest-link').dataset.static) document.getElementById('pwa-manifest-link').href = url;
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { window.addEventListener('load', function(){ var had = !!navigator.serviceWorker.controller, rl = false; navigator.serviceWorker.addEventListener('controllerchange', function(){ if (had && !rl) { rl = true; location.reload(); } had = true; }); navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function(reg){ var chk = function(){ try { reg.update(); } catch(e){} }; document.addEventListener('visibilitychange', function(){ if (!document.hidden) chk(); }); setInterval(chk, 600000); }).catch(function(){}); }); }
 })();
 </script>
 <script>
