@@ -5596,7 +5596,7 @@ img,video,canvas,svg{max-width:100%}
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:14px">
       <div style="font-size:12px;font-weight:800;color:var(--ink-faint);margin-bottom:10px">💳 طريقة الدفع</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="pay-pill pay-pill-paid sel" id="ppPaid" data-h="s59">💵 كاش كامل</button>
+        <button class="pay-pill pay-pill-paid" id="ppPaid" data-h="s59">💵 كاش كامل</button>
         <button class="pay-pill pay-pill-part"     id="ppPart" data-h="s60">📲 عربون + مع الشحن</button>
         <button class="pay-pill pay-pill-ship"     id="ppShip" data-h="s61">📦 مع شركة الشحن</button>
         <button class="pay-pill pay-pill-debt"     id="ppDebt" data-h="s62">⏳ آجل</button>
@@ -20047,6 +20047,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   var editingProdId = null;
   var invRowCount = 0;
   var invPayStatus = "paid";
+  var invPayChosen = false;
   var toastTimer;
   var dashPeriod = "week";
   var SUPA_URL = "https://rlfwqedyeazqksrboxsc.supabase.co";
@@ -24201,8 +24202,14 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       badge.textContent = connected ? "\u{1F7E2} \u0645\u062A\u0635\u0644 \u2014 \u0642\u0637\u0639" : "\u{1F535} \u0627\u062A\u0635\u0644 \u0628\u0627\u0644\u0637\u0627\u0628\u0639\u0629";
     }
   }
+  function resetPayStatus() {
+    setPayStatus("paid");
+    invPayChosen = false;
+    ["Paid", "Part", "Ship", "Debt"].forEach((x) => { const b = document.getElementById("pp" + x); if (b) b.classList.remove("sel"); });
+  }
   function setPayStatus(s) {
     invPayStatus = s;
+    invPayChosen = true;
     ["paid", "part", "ship", "debt"].forEach((x) => {
       const btn = document.getElementById("pp" + x.charAt(0).toUpperCase() + x.slice(1));
       if (btn) btn.classList.toggle("sel", x === s);
@@ -24539,6 +24546,11 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       showToast("\u23F3 \u062C\u0627\u0631\u064A \u0627\u0644\u062D\u0641\u0638... \u0627\u0646\u062A\u0638\u0631");
       return;
     }
+    if (!invPayChosen) {
+      showToast("\u26A0\uFE0F \u0627\u062E\u062A\u0627\u0631 \u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639 \u0627\u0644\u0623\u0648\u0644 (\u0643\u0627\u0634 \u0643\u0627\u0645\u0644 / \u0639\u0631\u0628\u0648\u0646 / \u0622\u062C\u0644)");
+      try { cwGo(3); } catch (e) {}
+      return;
+    }
     const rows = document.querySelectorAll("#invRows .inv-item-row");
     const client = document.getElementById("invClient").value.trim();
     const clientPhone = document.getElementById("invClientPhone").textContent.trim();
@@ -24705,7 +24717,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       if (depMethodEl) depMethodEl.value = "";
       document.getElementById("invRestLabel").style.display = "none";
       document.getElementById("shipOnlyRow").style.display = "none";
-      setPayStatus("paid");
+      resetPayStatus();
       addInvRow(true);
       updateInvHeroNum();
       renderInvoiceList();
@@ -24925,7 +24937,8 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const numTxt = /^[A-Za-z]/.test(numRaw) ? numRaw : (s.invPrefix || "INV") + "-" + (numRaw && numRaw !== "\u2014" ? numRaw : "----");
     const notes = (document.getElementById("invNotes")?.value || "").trim();
     let paid = 0, payTxt;
-    if (invPayStatus === "paid") { paid = grand; payTxt = "\u0643\u0627\u0634"; }
+    if (!invPayChosen) { paid = 0; payTxt = "\u2014"; }
+    else if (invPayStatus === "paid") { paid = grand; payTxt = "\u0643\u0627\u0634"; }
     else if (invPayStatus === "debt") payTxt = "\u0622\u062C\u0644";
     else if (invPayStatus === "ship") payTxt = "\u0645\u0639 \u0634\u0631\u0643\u0629 \u0627\u0644\u0634\u062D\u0646";
     else {
@@ -25138,7 +25151,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     if (dm) dm.value = "";
     document.getElementById("invRestLabel").style.display = "none";
     document.getElementById("shipOnlyRow").style.display = "none";
-    setPayStatus("paid");
+    resetPayStatus();
     addInvRow(true);
     updateInvTotal();
   }
