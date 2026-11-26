@@ -1226,71 +1226,6 @@ tbody tr:last-child td{border-bottom:none}
 #invCreateView.lv-saved .lv-box>.lv-zoom{display:flex}
 @media print{.lv-zoom{display:none!important}}
 
-
-/* ── Sheet workspace: the new-invoice page IS the classic sheet ── */
-#invCreateView.sw-on:not(.lv-saved) .cw-card,#invCreateView.sw-on:not(.lv-saved) .cw-bar,#invCreateView.sw-on .cw-total,#invCreateView.sw-on .cw-stepno,#invCreateView.sw-on:not(.lv-saved) .lv-box{display:none!important}
-#invCreateView.sw-on.lv-saved .sw-sheet,#invCreateView.sw-on.lv-saved .sw-savebar{display:none!important}
-#invCreateView.sw-on{padding-bottom:90px}
-.sw-sheet{direction:ltr;position:relative;max-width:780px;margin:8px auto;background:#fff;border:1px solid #cbd5e1;border-radius:10px;font-family:'Cairo',Arial,'Segoe UI',Tahoma,sans-serif;color:#111;padding-bottom:6px}
-.sw-sheet .mb-top{display:flex;align-items:center;background:#e5e5e5;font-size:13px;font-weight:700;padding:7px 12px;gap:12px;border-radius:10px 10px 0 0}
-.sw-sheet .mb-top-d input{border:1px solid #bbb;border-radius:6px;padding:3px 6px;font:inherit;font-size:12px;background:#fff;width:132px}
-.sw-sheet .mb-top-d{border-left:2px solid #fff;padding-left:12px;min-width:0}
-#invCreateView .sw-sheet .mb-co{padding:10px 12px}
-.sw-sheet .mb-to{align-items:flex-start}
-.sw-sheet .mb-to-l{flex:1 1 260px;min-width:0}
-.sw-sheet .mb-to-r{flex:1 1 200px;font-size:12px;text-align:right}
-.sw-sheet .ff{margin:0}.sw-sheet .ff>label{display:none}
-.sw-sheet .client-search-wrap{position:relative}
-.sw-sheet #invClient{width:100%;border:1.5px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;text-align:right;direction:rtl;background:#fff}
-.sw-sheet .inv-client-info{direction:rtl;font-size:12px;margin:4px 0 0}
-.sw-bar{display:flex;gap:8px;padding:8px 12px 4px;align-items:flex-start;direction:rtl}
-.sw-search{position:relative;flex:1}
-.sw-search input{width:100%;border:1.5px solid #3b82f6;border-radius:9px;padding:9px 12px;font-family:inherit;font-size:14px;outline:none;background:#f8fbff}
-.sw-dd{display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1.5px solid #bfdbfe;border-radius:12px;box-shadow:0 14px 36px rgba(15,23,42,.16);z-index:900;max-height:260px;overflow-y:auto}
-.sw-dd.show{display:block}
-.sw-dd .prod-dd-item{direction:rtl}
-.sw-bar #btnBcScanner{padding:9px 12px!important;white-space:nowrap}
-.sw-sheet #bcScanFlash{margin:4px 12px!important;padding:7px 12px!important}
-.sw-sheet .inv-section-divider{display:none}
-#invCreateView .sw-sheet .inv-table-wrap{padding:0 12px;border:0;background:none;box-shadow:none;overflow:visible}
-#invCreateView .sw-sheet .inv-items-header{display:grid!important;grid-template-columns:26px minmax(0,1fr) 78px 56px 78px 26px;gap:0;padding:0;background:none;border:1px solid #333;border-bottom:0;direction:ltr}
-#invCreateView .sw-sheet .inv-items-header span{display:block!important;font-size:11px;font-weight:700;color:#111;letter-spacing:0;text-transform:none;padding:3px 4px;border:0;border-left:1px solid #333;background:#fff}
-#invCreateView .sw-sheet .inv-items-header span:first-child{border-left:0}
-#invCreateView .sw-sheet #invRows{background:none;padding:0;counter-reset:swr;border:1px solid #333;border-top:0}
-#invCreateView .sw-sheet .inv-item-row{display:grid!important;grid-template-columns:26px minmax(0,1fr) 78px 56px 78px 26px!important;gap:0!important;margin:0!important;padding:0!important;border:0!important;border-top:1px solid #333!important;border-radius:0!important;background:#fff!important;align-items:stretch!important;counter-increment:swr;box-shadow:none!important;flex-direction:row!important;direction:ltr}
-#invCreateView .sw-sheet .inv-item-row:first-child{border-top:0!important}
-#invCreateView .sw-sheet .inv-item-row::before{content:counter(swr);grid-column:1;grid-row:1;font-size:11px;padding:6px 4px;border-left:0;display:flex;align-items:center}
-#invCreateView .sw-sheet .inv-item-row>*{grid-row:1;border-left:1px solid #333}
-#invCreateView .sw-sheet .inv-item-row .prod-search-wrap{grid-column:2!important;min-width:0}
-#invCreateView .sw-sheet .inv-item-row>input[type=number]:nth-of-type(1){grid-column:4}
-#invCreateView .sw-sheet .inv-item-row>input[type=number]:nth-of-type(2){grid-column:3}
-#invCreateView .sw-sheet .inv-item-row .inv-item-total{grid-column:5;display:flex;align-items:center;justify-content:flex-end;padding:0 4px;font-size:11.5px!important;font-weight:600!important}
-#invCreateView .sw-sheet .inv-item-row .btn-rm-row{grid-column:6;width:auto!important;min-height:0!important;border:0;border-left:1px solid #333;background:#fff;color:#dc2626;font-size:13px;padding:0}
-#invCreateView .sw-sheet .inv-item-row input{border:0!important;border-radius:0!important;background:transparent!important;padding:6px 4px!important;font-size:12px!important;text-align:right!important;width:100%!important;box-shadow:none!important;direction:ltr}
-#invCreateView .sw-sheet .inv-item-row .prod-search-inp{text-align:right!important;direction:rtl;font-size:12px!important}
-#invCreateView .sw-sheet .inv-item-row input:focus{background:#eef6ff!important}
-#invCreateView .sw-sheet .inv-item-row .avail-badge{position:absolute;left:30px;top:0;font-size:9px!important;margin:0!important;padding:1px 5px!important}
-#invCreateView .sw-sheet .prod-dd{min-width:260px}
-#invCreateView .sw-sheet .inv-actions-row{padding:6px 0 0;margin:0;justify-content:flex-start}
-#invCreateView .sw-sheet .inv-actions-row .btn-add-row{flex:none;padding:6px 14px;font-size:12px}
-.sw-tot{display:flex;flex-wrap:wrap;gap:12px;padding:8px 12px 0;direction:rtl}
-.sw-tot>div{flex:1 1 260px}
-.sw-tot .inv-footer{padding:0!important;border:0!important;background:none!important;margin:0!important;display:block!important}
-.sw-tot .inv-total-box{background:#e5e5e5!important;border:0!important;border-radius:0!important;padding:6px 10px!important}
-.sw-tot .inv-total-label{font-size:13px!important;font-weight:700}
-.sw-tot .inv-total-val{font-size:17px!important;font-weight:800}
-.sw-sheet .mb-rem{direction:rtl}
-.sw-sheet #invNotes{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12px;margin-top:4px}
-.sw-savebar{position:sticky;bottom:0;z-index:20;max-width:780px;margin:0 auto;padding:10px 8px 12px;background:linear-gradient(#fff0,#fff 30%)}
-.sw-savebar .btn-save-inv{width:100%;display:flex!important}
-@media (max-width:520px){
-  #invCreateView .sw-sheet .inv-items-header,#invCreateView .sw-sheet .inv-item-row{grid-template-columns:22px minmax(0,1fr) 62px 46px 66px 24px!important}
-  .sw-sheet .mb-top{padding:7px 8px;gap:8px;font-size:12px}
-  .sw-sheet .mb-top-d input{width:112px;font-size:10px;padding:2px 0;letter-spacing:-.3px}
-  .sw-sheet .mb-top-d{padding-left:6px}
-  #invCreateView .sw-sheet .inv-table-wrap{padding:0 6px}
-}
-
 /* ── @print — مهم للطباعة ── */
 @media print{
   #invPrintModal{display:flex!important;position:static!important;background:none!important;backdrop-filter:none!important;padding:0!important}
@@ -24980,7 +24915,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   var _lvT = 0;
   function lvSchedule() {
     clearTimeout(_lvT);
-    _lvT = setTimeout(function () { try { swSync(); } catch (e) { console.error(e); } lvRender(); }, 60);
+    _lvT = setTimeout(lvRender, 60);
   }
   function lvRender() {
     const box = document.getElementById("lvSheet");
@@ -25037,7 +24972,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   (function lvInit() {
     const view = document.getElementById("invCreateView");
     if (!view) return;
-    view.classList.add("sw-on");
+    view.classList.add("lv-on");
     ["input", "change", "click", "keyup"].forEach((ev) => view.addEventListener(ev, lvSchedule, true));
     const tg = document.getElementById("lvToggle");
     if (tg) tg.addEventListener("click", () => document.getElementById("lvBox").classList.toggle("shut"));
@@ -25052,113 +24987,6 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   })();
 
 
-
-  // ===== sheet workspace: the existing form controls are moved into the classic sheet (same ids / same save logic) =====
-  function swValidate() {
-    const its = cwItems();
-    if (!its.length) { showToast("\u26A0\uFE0F \u0623\u0636\u0641 \u0645\u0646\u062A\u062C \u0648\u0627\u062D\u062F \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644"); return false; }
-    if (its.some((i) => !(i.qty > 0) || !(i.price > 0))) { showToast("\u26A0\uFE0F \u0631\u0627\u062C\u0639 \u0627\u0644\u0643\u0645\u064A\u0629 \u0648\u0627\u0644\u0633\u0639\u0631 \u0644\u0643\u0644 \u0635\u0646\u0641"); return false; }
-    return true;
-  }
-  function swSync() {
-    const s = getStoreSettings();
-    const num = document.getElementById("swNum");
-    if (!num) return;
-    const raw = (document.getElementById("invHeroNum")?.textContent || "").replace("#", "").trim();
-    num.textContent = (s.invPrefix || "INV") + "-" + (raw && raw !== "\u2014" ? raw : "----");
-    let c = "";
-    if (s.address) c += `<span dir="auto">${esc3(s.address)}</span>`;
-    if (s.phone1) c += `<span><b>Contact:</b> ${esc3(s.phone1 + (s.phone2 ? " | " + s.phone2 : ""))}</span>`;
-    document.getElementById("swCoContact").innerHTML = c;
-    document.getElementById("swCoName").textContent = s.nameAr || "Tmima Shoes";
-    document.getElementById("swLogo").innerHTML = s.logoData ? `<img src="${s.logoData}">` : "";
-    document.getElementById("swPolicy").textContent = (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY;
-    document.getElementById("swSig").textContent = s.sigName || "Tmima Shoes";
-    document.getElementById("swTag").textContent = (s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644";
-  }
-  function swFindProducts(q) {
-    const nq = norm(q);
-    return (nq ? products.filter((p) => norm(p.name).includes(nq) || (p.code && norm(p.code).includes(nq))) : products.slice(0, 8)).slice(0, 30);
-  }
-  function swRenderDD() {
-    const inp = document.getElementById("swSearch"), dd = document.getElementById("swDD");
-    if (!inp || !dd) return;
-    const hits = swFindProducts(inp.value);
-    if (!hits.length) { dd.innerHTML = `<div class="prod-dd-empty">${"\u0644\u0627 \u062A\u0648\u062C\u062F \u0646\u062A\u0627\u0626\u062C"}</div>`; dd.classList.add("show"); return; }
-    dd.innerHTML = hits.map((p) => {
-      const used = [...document.querySelectorAll("#invRows .inv-item-row")].filter((r) => parseInt(r.dataset.prodId) === p.id).length;
-      const q = Number(p.qty) || 0;
-      const cls = q <= 0 ? "zero" : q <= 3 ? "low" : "ok";
-      return `<div class="prod-dd-item${q <= 0 ? " zero" : ""}" data-pid="${p.id}"><div><div style="display:flex;align-items:center;gap:6px"><span class="prod-dd-name">${esc3(p.name)}</span>${p.code && !/^\d{13}$/.test(String(p.code)) ? `<span class="prod-dd-code">${esc3(p.code)}</span>` : ""}</div><div class="prod-dd-meta">${fmt(p.sellPrice)} \u062C${used ? " \u00B7 \u2713 \u0645\u0636\u0627\u0641" : ""}</div></div><span class="prod-dd-qty ${cls}">${fmtQty(q)} \u0645\u062A\u0627\u062D</span></div>`;
-    }).join("");
-    dd.classList.add("show");
-  }
-  async function swAddProduct(pid) {
-    const p = products.find((x) => x.id === pid);
-    if (!p) return;
-    const inp = document.getElementById("swSearch");
-    document.getElementById("swDD").classList.remove("show");
-    await addProductToInvoice(p, 1);
-    if (inp) { inp.value = ""; inp.focus(); }
-    lvSchedule();
-  }
-  (function swInit() {
-    const v = document.getElementById("invCreateView");
-    const card = v && v.querySelector(".cw-card");
-    if (!v || !card || document.getElementById("swSheet")) return;
-    const q = (id) => document.getElementById(id);
-    const sheet = document.createElement("div");
-    sheet.className = "sw-sheet";
-    sheet.id = "swSheet";
-    sheet.innerHTML = `
-      <div class="mb-top"><span class="mb-top-l">INVOICE</span><span class="mb-top-n" id="swNum"></span><span class="mb-top-d" id="swDateSlot"></span></div>
-      <div class="mb-co"><div class="mb-logo" id="swLogo"></div><div class="mb-coname"><div id="swCoName"></div></div><div class="mb-cocontact" id="swCoContact"></div></div>
-      <div class="mb-to"><div class="mb-to-l"><div class="mb-lbl">TO,</div><div id="swCliSlot"></div></div><div class="mb-to-r" id="swToR"></div></div>
-      <div class="sw-bar"><div class="sw-search"><input type="text" id="swSearch" autocomplete="off" placeholder="\u{1F50D} \u0627\u0628\u062D\u062B \u0639\u0646 \u0645\u0646\u062A\u062C \u0628\u0627\u0644\u0627\u0633\u0645 \u0623\u0648 \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062F \u0648\u0627\u0636\u063A\u0637 \u0639\u0644\u064A\u0647 \u0644\u0625\u0636\u0627\u0641\u062A\u0647"><div class="sw-dd" id="swDD" onmousedown="event.preventDefault()"></div></div><div id="swBcSlot"></div></div>
-      <div id="swItemsSlot"></div>
-      <div class="sw-tot" id="swTotSlot"></div>
-      <div class="mb-rem"><div class="mb-rem-h">Remarks</div><div class="mb-rem-t" id="swPolicy" dir="auto"></div><div id="swNotesSlot"></div></div>
-      <div class="mb-bottom"><div></div><div class="mb-sig"><div id="swSig" dir="auto"></div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
-      <div class="mb-tag" id="swTag" dir="auto"></div>`;
-    card.parentNode.insertBefore(sheet, card);
-    const mv = (el, slot) => { if (el && q(slot)) q(slot).appendChild(el); };
-    mv(q("invDate"), "swDateSlot");
-    mv(q("invClient") && q("invClient").closest(".ff"), "swCliSlot");
-    mv(q("invClientInfo"), "swToR");
-    mv(q("btnBcScanner"), "swBcSlot");
-    mv(q("bcScanFlash"), "swItemsSlot");
-    mv(card.querySelector(".inv-table-wrap"), "swItemsSlot");
-    mv(q("invNotes") && q("invNotes").closest(".ff"), "swNotesSlot");
-    const pay = card.querySelector('.cw-step[data-s="3"] > div[style*="border:1px solid var(--border)"]');
-    const foot = card.querySelector(".inv-footer");
-    const tot = q("swTotSlot");
-    if (pay) { const w = document.createElement("div"); w.appendChild(pay); tot.appendChild(w); }
-    if (foot) { const w = document.createElement("div"); w.appendChild(foot); tot.appendChild(w); }
-    const hdr = sheet.querySelector(".inv-items-header");
-    if (hdr) hdr.innerHTML = "<span>Sr</span><span>Items</span><span>Price</span><span>Qty</span><span>Amount</span><span></span>";
-    const sv = v.querySelector(".cw-bar .btn-save-inv");
-    if (sv) { const bar = document.createElement("div"); bar.className = "sw-savebar"; bar.appendChild(sv); v.appendChild(bar); }
-    const si = q("swSearch"), dd = q("swDD");
-    si.addEventListener("input", swRenderDD);
-    si.addEventListener("focus", swRenderDD);
-    si.addEventListener("blur", () => setTimeout(() => dd.classList.remove("show"), 150));
-    si.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter") return;
-      e.preventDefault();
-      const val = si.value.trim();
-      const exact = products.find((p) => p.code && norm(p.code) === norm(val));
-      const hits = swFindProducts(val);
-      const pick = exact || (hits.length === 1 ? hits[0] : null);
-      if (pick) swAddProduct(pick.id);
-    });
-    dd.addEventListener("click", (e) => {
-      const it = e.target.closest(".prod-dd-item");
-      if (!it) return;
-      if (it.classList.contains("zero")) { showToast("\u26A0\uFE0F \u0647\u0630\u0627 \u0627\u0644\u0645\u0646\u062A\u062C \u0645\u0634 \u0645\u062A\u0627\u062D \u0641\u064A \u0627\u0644\u0645\u062E\u0632\u0646"); return; }
-      swAddProduct(parseInt(it.dataset.pid));
-    });
-    try { swSync(); } catch (e) { console.error(e); }
-  })();
   // ===== invoice scale slider (post-save page + old-invoice modal), carried into print/PDF =====
   function getInvScale() {
     let v = 100;
@@ -27616,7 +27444,6 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     updateInvTotal();
   } };
   window.__HS["s67"] = { "click": function(event) {
-    if (!swValidate()) return;
     saveInvoice();
   } };
   window.__HS["s68"] = { "input": function(event) {
