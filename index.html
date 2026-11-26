@@ -24919,7 +24919,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const dd = new Date(dv);
     const dtxt = isNaN(dd) ? dv : String(dd.getDate()).padStart(2, "0") + "-" + String(dd.getMonth() + 1).padStart(2, "0") + "-" + dd.getFullYear();
     const numRaw = (document.getElementById("invHeroNum")?.textContent || "").replace("#", "").trim();
-    const numTxt = (s.invPrefix || "INV") + "-" + (numRaw && numRaw !== "\u2014" ? numRaw : "----");
+    const numTxt = /^[A-Za-z]/.test(numRaw) ? numRaw : (s.invPrefix || "INV") + "-" + (numRaw && numRaw !== "\u2014" ? numRaw : "----");
     const notes = (document.getElementById("invNotes")?.value || "").trim();
     let paid = 0, payTxt;
     if (invPayStatus === "paid") { paid = grand; payTxt = "\u0643\u0627\u0634"; }
@@ -25706,7 +25706,8 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     if (s.email) contacts += `<span>${esc3(s.email)}</span>`;
     document.getElementById("prmCoContacts").innerHTML = contacts;
     const prefix = s.invPrefix || "INV";
-    const numTxt = `${prefix}-${String(inv2.num || id).padStart(4, "0")}`;
+    const numStr = String(inv2.num || id);
+    const numTxt = /^[A-Za-z]/.test(numStr) ? numStr : `${prefix}-${numStr.padStart(4, "0")}`;
     document.getElementById("prmInvNum").textContent = numTxt;
     const dd = inv2.date ? new Date(inv2.date) : new Date();
     const ddTxt = isNaN(dd) ? (inv2.date || "") : String(dd.getDate()).padStart(2, "0") + "-" + String(dd.getMonth() + 1).padStart(2, "0") + "-" + dd.getFullYear();
@@ -25862,13 +25863,17 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
 <html dir="rtl" lang="ar">
 <head>
   <meta charset="UTF-8">
+  <title>${(document.getElementById("prmInvNum")?.textContent || "Invoice").replace(/[<>&]/g,"")}</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;background:#fff;direction:rtl}
     ${styles}
-    #invWrap{width:194mm;margin:0 auto;zoom:1}
+    html,body{background:#fff!important}
+    #invWrap{margin:0 auto;box-sizing:border-box}
+    #invWrap .prm-sheet{zoom:1!important;margin:0!important;width:100%!important;max-width:none!important}
+    #invZ{margin:0 auto}
     #prCtl{position:sticky;top:0;z-index:10;background:#f1f5f9;border-bottom:1px solid #cbd5e1;padding:10px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:13px;font-weight:700;color:#334155}
     #prCtl input[type=range]{width:170px;vertical-align:middle}
     #prCtl select{font-family:inherit;font-size:13px;font-weight:700;padding:5px 8px;border:1.5px solid #cbd5e1;border-radius:8px}
@@ -25880,14 +25885,14 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       .print-only-btn{display:none!important}
     }
   </style>
-  <style id="pgStyle">@page{size:A4;margin:8mm}</style>
+  <style id="pgStyle">@page{size:A4 portrait;margin:0}</style>
 </head>
 <body>
   <div id="prCtl">
     <label>\u{1F4C4} \u0627\u0644\u0648\u0631\u0642\u0629:
       <select id="prPaper">
-        <option value="A5">A5 (\u0646\u0635 A4)</option>
         <option value="A4">A4</option>
+        <option value="A5">A5 (\u0646\u0635 A4)</option>
         <option value="80">\u0631\u0648\u0644 80 \u0645\u0645</option>
         <option value="58">\u0631\u0648\u0644 58 \u0645\u0645</option>
       </select></label>
@@ -25895,26 +25900,30 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     <button id="prCloseBtn" style="background:none;border:1.5px solid #cbd5e1;color:#64748b">\u2715 \u0625\u063A\u0644\u0627\u0642</button>
   </div>
   <div id="invWrap">
-    ${sheet.outerHTML}
+    <div id="invZ">${sheet.outerHTML}</div>
   </div>
   <script>
     (function(){
       var pp=document.getElementById('prPaper'), wrap=document.getElementById('invWrap'), pg=document.getElementById('pgStyle');
-      try{ pp.value=localStorage.getItem('tm_inv_paper3')||'A5'; }catch(e){ pp.value='A5'; }   // \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A A5 (\u0646\u0635 A4)
-      // \u062A\u0644\u0642\u0627\u0626\u064A: \u0644\u0648 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629 \u0623\u0637\u0648\u0644 \u0645\u0646 \u0627\u0644\u0648\u0631\u0642\u0629 (\u0628\u0646\u0648\u062F \u0643\u062A\u064A\u0631) \u0628\u062A\u062A\u0635\u063A\u0631 \u0644\u0648\u062D\u062F\u0647\u0627 \u0648\u062A\u062F\u062E\u0644 \u0635\u0641\u062D\u0629 \u0648\u0627\u062D\u062F\u0629\u060C \u0648\u0644\u0648 \u0642\u0644\u064A\u0644\u0629 \u0628\u062A\u0627\u062E\u062F \u0627\u0644\u0648\u0631\u0642\u0629 \u0639\u0627\u062F\u064A
+      var K=${(function(){ try{ return Math.min(130,Math.max(50,parseInt(localStorage.getItem("tm_inv_scale"))||100))/100; }catch(e){ return 1; } })()};
+      var z=document.getElementById('invZ');
+      try{ pp.value=localStorage.getItem('tm_inv_paper4')||'A4'; }catch(e){ pp.value='A4'; }
+      if(!pp.value) pp.value='A4';
       function apply(){
-        var p=pp.value, css='', w, pageH=0;
-        wrap.style.zoom='';
-        if(p==='A4'){ css='@page{size:A4;margin:8mm}'; w=194; pageH=281; }
-        else if(p==='A5'){ css='@page{size:A5;margin:6mm}'; w=136; pageH=198; }
-        else { var r=Number(p); css='@page{size:'+r+'mm auto;margin:2mm}'; w=r-4; }
-        wrap.style.width=w+'mm'; wrap.style.margin='0 auto';
+        var p=pp.value, css, pw, ph=0, m=8;
+        if(p==='A4'){ css='@page{size:A4 portrait;margin:0}'; pw=210; ph=297; }
+        else if(p==='A5'){ css='@page{size:A5 portrait;margin:0}'; pw=148; ph=210; m=6; }
+        else { pw=Number(p); css='@page{size:'+pw+'mm auto;margin:0}'; m=2; }
         pg.textContent=css;
-        if(pageH){
-          var h=wrap.getBoundingClientRect().height*25.4/96;
-          if(h>pageH) wrap.style.zoom=String(Math.floor(pageH/h*0.98*100)/100);
+        wrap.style.width=pw+'mm'; wrap.style.padding=m+'mm';
+        z.style.zoom=''; z.style.width=((pw-2*m)/K)+'mm';
+        z.style.zoom=String(K);
+        if(ph){
+          var h=z.getBoundingClientRect().height*25.4/96;
+          var avail=ph-2*m-2;
+          if(h>avail) z.style.zoom=String(Math.floor(K*avail/h*100)/100);
         }
-        try{ localStorage.setItem('tm_inv_paper3',p); }catch(e){}
+        try{ localStorage.setItem('tm_inv_paper4',p); }catch(e){}
       }
       pp.addEventListener('change',apply);
       document.getElementById('prPrintBtn').addEventListener('click',function(){ window.print(); });
