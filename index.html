@@ -1201,12 +1201,7 @@ tbody tr:last-child td{border-bottom:none}
 .lv-sheet .mb-top{display:flex;align-items:center;background:#e5e5e5;font-size:13px;font-weight:700;padding:9px 14px;gap:14px}
 .lv-sheet .mb-tbl th{font-weight:600;background:#fff;color:#111;font-size:11.5px}
 .lv-empty{text-align:center;color:#94a3b8;font-size:11px;padding:8px}
-@media (min-width:1000px){
-  #invCreateView.lv-on:not([style*="none"]){display:grid!important;grid-template-columns:minmax(0,1fr) 520px;column-gap:16px;align-items:start}
-  #invCreateView.lv-on .cw-head,#invCreateView.lv-on .cw-total{grid-column:1 / -1}
-  #invCreateView.lv-on .lv-box{grid-column:2;grid-row:3 / span 6;position:sticky;top:10px;margin:10px 0}
-  #invCreateView.lv-on .cw-card{grid-column:1;grid-row:3}
-  .lv-toggle{display:none}
+#invCreateView:not(.lv-saved) .lv-box{display:none!important}
 }
 
 
