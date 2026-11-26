@@ -9,7 +9,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="تميمة شوز">
-<link rel="manifest" id="pwa-manifest-link">
+<link rel="manifest" id="pwa-manifest-link" href="manifest.webmanifest" data-static="1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <script>
 // إنشاء PWA Manifest ديناميكياً
 (function(){
@@ -43,7 +45,8 @@
   if(!/^https?:$/.test(location.protocol)){ var _ml=document.getElementById('pwa-manifest-link'); if(_ml) _ml.remove(); return; }
   const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  document.getElementById('pwa-manifest-link').href = url;
+  if (!document.getElementById('pwa-manifest-link').dataset.static) document.getElementById('pwa-manifest-link').href = url;
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
 })();
 </script>
 <script>
@@ -27590,7 +27593,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       }
       const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      document.getElementById("pwa-manifest-link").href = url;
+      if (!document.getElementById("pwa-manifest-link").dataset.static) document.getElementById("pwa-manifest-link").href = url;
     })();
     window.__tmErrors = window.__tmErrors || [];
     let _errToastAt = 0;
