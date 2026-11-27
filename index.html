@@ -29025,9 +29025,93 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       console.error(e);
     }
   }
+  async function startNativeScanner(cameraId) {
+    if (!("BarcodeDetector" in window)) return false;
+    let det;
+    try {
+      let fm = ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e", "qr_code", "itf"];
+      if (BarcodeDetector.getSupportedFormats) {
+        const sup = await BarcodeDetector.getSupportedFormats();
+        fm = fm.filter((f) => sup.indexOf(f) >= 0);
+      }
+      if (!fm.length) return false;
+      det = new BarcodeDetector({ formats: fm });
+    } catch (e) {
+      return false;
+    }
+    const host = document.getElementById("bcCamVideo");
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { deviceId: { exact: cameraId }, width: { ideal: 1600 }, height: { ideal: 1200 }, frameRate: { ideal: 30 } } });
+    } catch (e) {
+      return false;
+    }
+    host.innerHTML = "";
+    const v = document.createElement("video");
+    v.setAttribute("playsinline", "");
+    v.muted = true;
+    v.autoplay = true;
+    v.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
+    v.srcObject = stream;
+    host.appendChild(v);
+    try {
+      await v.play();
+    } catch (e) {
+    }
+    let alive = true, busy = false, last = "", lastT = 0;
+    const tick = async () => {
+      if (!alive) return;
+      if (!busy && v.readyState >= 2) {
+        busy = true;
+        try {
+          const r = await det.detect(v);
+          if (alive && r && r.length) {
+            const code = String(r[0].rawValue || "").trim();
+            const now = Date.now();
+            if (code && (code !== last || now - lastT > 1500)) {
+              last = code;
+              lastT = now;
+              try {
+                navigator.vibrate && navigator.vibrate(40);
+              } catch (e) {
+              }
+              processBcCode(code);
+            }
+          }
+        } catch (e) {
+        }
+        busy = false;
+      }
+      if (!alive) return;
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(tick);
+      else requestAnimationFrame(tick);
+    };
+    bcScanner = {
+      native: true,
+      stop: async () => {
+        alive = false;
+        try {
+          stream.getTracks().forEach((t) => t.stop());
+        } catch (e) {
+        }
+      },
+      clear: () => {
+        try {
+          host.innerHTML = "";
+        } catch (e) {
+        }
+      }
+    };
+    bcRunning = true;
+    setupBcTools();
+    document.getElementById("bcCamStatus").textContent = "\u0648\u062C\u0651\u0647 \u0639\u0644\u0649 \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062F";
+    tick();
+    return true;
+  }
   async function startBcScanner(cameraId) {
     await stopBcScanner();
     bindBcManual();
+    if (await startNativeScanner(cameraId)) return;
     const F = window.Html5QrcodeSupportedFormats;
     const cfgScan = { formatsToSupport: F ? [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39, F.QR_CODE] : void 0 };
     try {
@@ -29085,16 +29169,29 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }
     const adv = (o) => tr.applyConstraints({ advanced: [o] }).catch((e) => console.warn("constraint", e));
     if (cap.focusMode && cap.focusMode.indexOf("continuous") >= 0) adv({ focusMode: "continuous" });
+    const refocus = () => {
+      if (cap.focusMode && cap.focusMode.indexOf("continuous") >= 0) setTimeout(() => adv({ focusMode: "continuous" }), 150);
+    };
     if (cap.zoom && cap.zoom.max > 1) {
       const maxZ = cap.zoom.max;
       const steps = [1, Math.min(2, maxZ)];
       if (maxZ >= 3) steps.push(Math.min(3, maxZ));
+      let saved = parseFloat(localStorage.getItem("bc_zoom"));
+      if (!(saved >= 1)) saved = 2;
       let zi = 0;
-      zb.textContent = "\u{1F50D} 1x";
+      steps.forEach((z, i) => {
+        if (Math.abs(z - saved) < Math.abs(steps[zi] - saved)) zi = i;
+      });
+      zb.textContent = "\u{1F50D} " + steps[zi] + "x";
       zb.style.display = "inline-block";
+      if (steps[zi] > 1) adv({ zoom: steps[zi] }).then(refocus);
       zb.onclick = () => {
         zi = (zi + 1) % steps.length;
-        adv({ zoom: steps[zi] });
+        try {
+          localStorage.setItem("bc_zoom", String(steps[zi]));
+        } catch (e) {
+        }
+        adv({ zoom: steps[zi] }).then(refocus);
         zb.textContent = "\u{1F50D} " + steps[zi] + "x";
       };
     }
