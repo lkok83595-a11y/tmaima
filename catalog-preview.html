@@ -49,6 +49,9 @@ main{padding:14px;max-width:980px;margin:0 auto}
 .sheet .price{font-size:24px}
 .x{position:absolute;top:10px;left:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,253,248,.92);font-size:20px;color:var(--ink);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .card{cursor:pointer}
+.hint{font-size:12px;color:var(--faint);text-align:center}
+button.order{border:0;cursor:pointer;width:100%}
+.shot{background:var(--teal-bg);color:var(--teal);border-radius:12px;padding:11px 12px;text-align:center;font-weight:600;font-size:14px;margin-top:4px}
 footer{text-align:center;color:var(--faint);font-size:12px;padding:10px 0 28px}
 </style>
 </head>
@@ -63,7 +66,7 @@ footer{text-align:center;color:var(--faint);font-size:12px;padding:10px 0 28px}
 var URL_="https://rlfwqedyeazqksrboxsc.supabase.co/rest/v1/";
 var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZndxZWR5ZWF6cWtzcmJveHNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2ODEyMzAsImV4cCI6MjExMDI1NzIzMH0.AnqZ0BreeNJZdUkVvqDy5hUszNhD5F1Viz_aAEX5rao";
 var H={apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"};
-var items=[],shown=[],cat="all",phone="",shop="";
+var cur=null,file=null,url_=null,items=[],shown=[],cat="all",phone="",shop="";
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function safeImg(u){u=String(u||"");return /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u)||/^https:\/\//.test(u)?u:""}
@@ -99,7 +102,7 @@ shown=list;
    (code?'<span class="code">#'+esc(code)+'</span>':'')+'</div><div class="info"><div class="name">'+esc(p.name)+'</div>'+
    (p.category?'<span class="cat">'+esc(p.category)+'</span>':'')+
    '<div class="price">'+fmt(p.sell_price)+' ج</div>'+
-   '<a class="order" target="_blank" rel="noopener" href="'+href+'">اطلب على واتساب</a></div></div>';
+   '</div></div>';
  }).join("");
 }
 function chips(){
@@ -114,11 +117,44 @@ function open_(p){
  var href=phone?"https://wa.me/"+phone+"?text="+encodeURIComponent(text):"#";
  $("sheet").innerHTML='<button class="x" aria-label="إغلاق">\u00d7</button>'+(img?'<img class="big" alt="'+esc(p.name)+'" src="'+esc(img)+'">':'<div class="big noimg">\ud83d\udc5f</div>')+
   '<div class="body"><div class="name">'+esc(p.name)+'</div>'+(code?'<div style="color:var(--faint);font-size:13px">كود: #'+esc(code)+'</div>':'')+(p.category?'<span class="cat">'+esc(p.category)+'</span>':'')+
-  '<div class="price">'+fmt(p.sell_price)+' ج</div><a class="order" target="_blank" rel="noopener" href="'+href+'">اطلب على واتساب</a></div>';
+  '<div class="price">'+fmt(p.sell_price)+' ج</div><button class="order" id="shareImg" type="button">📸 صوّر المنتج و ابعتها لنا</button><div class="hint" id="hint">أو خد سكرين شوت للشاشة و ابعتها لنا</div><img id="out" alt="" style="display:none;width:100%;border-radius:12px"></div>';
+ cur=p;file=null;url_=null;makeFile(p).then(function(r){if(cur===p){file=r&&r.file;url_=r&&r.url}});
  $("lb").classList.add("on");document.body.style.overflow="hidden";
+}
+function makeFile(p){
+ var src=safeImg(p.image);if(!src)return Promise.resolve(null);
+ var code=p.code&&!/^\d{13}$/.test(String(p.code))?String(p.code):"";
+ return (document.fonts&&document.fonts.load?document.fonts.load('700 40px "IBM Plex Sans Arabic"'):Promise.resolve()).catch(function(){}).then(function(){
+  return new Promise(function(res){
+   var im=new Image();
+   im.onload=function(){
+    var S=800,c=document.createElement("canvas");c.width=S;c.height=S;var x=c.getContext("2d");
+    var r=Math.max(S/im.width,S/im.height),w=im.width*r,h=im.height*r;
+    x.drawImage(im,(S-w)/2,(S-h)/2,w,h);
+    var g=x.createLinearGradient(0,S*0.62,0,S);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.72)");
+    x.fillStyle=g;x.fillRect(0,S*0.62,S,S*0.38);
+    x.direction="rtl";x.textAlign="right";x.fillStyle="#fff";x.shadowColor="rgba(0,0,0,.5)";x.shadowBlur=8;
+    x.font='700 56px "IBM Plex Sans Arabic",Arial';x.fillText(fmt(p.sell_price)+" ج",S-28,S-30);
+    x.font='600 34px "IBM Plex Sans Arabic",Arial';x.fillText(String(p.name||""),S-28,S-100);
+    if(code){x.textAlign="left";x.font='700 32px "IBM Plex Sans Arabic",Arial';x.fillText("#"+code,28,S-30)}
+    try{c.toBlob(function(b){res(b?{file:new File([b],"product-"+(code||p.id)+".jpg",{type:"image/jpeg"}),url:URL.createObjectURL(b)}:null)},"image/jpeg",0.88)}catch(e){res(null)}
+   };
+   im.onerror=function(){res(null)};im.src=src;
+  });
+ });
+}
+function doShare(){
+ if(!file){$("hint").textContent="خد سكرين شوت للشاشة و ابعتها لنا";return}
+ if(navigator.canShare&&navigator.canShare({files:[file]})){
+  navigator.share({files:[file]}).catch(function(){});
+ }else{
+  var o=$("out");o.src=url_;o.style.display="block";
+  $("hint").textContent="اضغط مطولاً على الصورة و احفظها، أو خد سكرين شوت و ابعتها لنا";
+ }
 }
 function close_(){$("lb").classList.remove("on");document.body.style.overflow=""}
 $("grid").addEventListener("click",function(e){if(e.target.closest(".order"))return;var c=e.target.closest(".card");if(!c)return;var p=shown[+c.getAttribute("data-i")];if(p)open_(p)});
+$("sheet").addEventListener("click",function(e){if(e.target.id==="shareImg")doShare()});
 $("lb").addEventListener("click",function(e){if(e.target.id==="lb"||e.target.closest(".x"))close_()});
 load().then(function(d){
  var sh=d.shop||{};shop=sh.name||"";phone=waNum(sh.phone);
