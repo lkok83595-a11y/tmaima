@@ -21626,6 +21626,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   var flushing = false;
   var retryTimer = null;
   var lastFlushError = "";
+  var failSince = 0;
   var safeLS = {
     get(k) {
       try {
@@ -21667,7 +21668,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }, ms || 3e4);
   }
   function activityPending() {
-    return { queued: queue.length, failed: failed.length, state: serverState, error: lastFlushError };
+    return { queued: queue.length, failed: failed.length, state: serverState, error: lastFlushError, stuckMin: failSince ? Math.floor((Date.now() - failSince) / 6e4) : 0 };
   }
   var esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var money = (n) => Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
@@ -21714,8 +21715,9 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
           if (r.ok) {
             serverState = "ok";
             lastFlushError = "";
+            failSince = 0;
             queue.shift();
-            item.sess.synced = true;
+            if (item.sess) item.sess.synced = true;
             persist();
             continue;
           }
@@ -21737,11 +21739,13 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
             }
           }
           serverState = "error";
+          if (!failSince) failSince = Date.now();
           persist();
           scheduleRetry(3e4);
           return;
         } catch (e) {
           serverState = "error";
+          if (!failSince) failSince = Date.now();
           lastFlushError = "\u0644\u0627 \u064A\u0648\u062C\u062F \u0627\u062A\u0635\u0627\u0644";
           persist();
           scheduleRetry(3e4);
@@ -21755,6 +21759,21 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       } catch (e) {
       }
     }
+  }
+  function retryFailedActivity() {
+    failed.forEach((f) => {
+      const at = f.at || (/* @__PURE__ */ new Date()).toISOString();
+      queue.push({ row: f.row, at, tries: 0, sess: { ...f.row, created_at: at, synced: false, local: true } });
+    });
+    failed = [];
+    if (queue.length > QMAX) queue.splice(0, queue.length - QMAX);
+    persist();
+    flush();
+  }
+  function dismissFailedActivity() {
+    failed = [];
+    persist();
+    refreshPendingBadge();
   }
   function refreshPendingBadge() {
     if (document.getElementById("pg-activity")?.classList.contains("active")) renderActivity();
@@ -21946,7 +21965,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   function merged() {
     let rows;
     if (serverState === "ok") {
-      const pending = session.filter((x) => !x.synced);
+      const pending = session.filter((x) => x && !x.synced);
       rows = [...pending, ...serverRows];
       const oldest = serverRows.length ? Math.min(...serverRows.map((r) => +new Date(r.created_at))) : Infinity;
       rows = rows.concat(derived().filter((d) => +new Date(d.created_at) < oldest));
@@ -21975,8 +21994,8 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const q = state.q.trim().toLowerCase();
     const rows = all.filter((r) => (state.type === "all" || r.entity === state.type) && (!state.user || r.user_name === state.user) && (!q || (r.summary + " " + r.user_name).toLowerCase().includes(q)));
     const pend = queue.length ? ` <b>${queue.length}</b> \u062D\u0631\u0643\u0629 \u0644\u0633\u0647 \u0641\u064A \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u0648\u0647\u062A\u062A\u0628\u0639\u062A \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0627.` : "";
-    const failTxt = failed.length ? `<div class="tm-act-banner warn">\u26A0\uFE0F ${failed.length} \u062D\u0631\u0643\u0629 \u0631\u0641\u0636\u0647\u0627 \u0627\u0644\u0633\u064A\u0631\u0641\u0631 \u0648\u0644\u0645 \u062A\u064F\u062D\u0641\u0638 (${esc(failed[failed.length - 1].err || "")}). \u0631\u0627\u062C\u0639 \u0635\u0644\u0627\u062D\u064A\u0627\u062A \u062C\u062F\u0648\u0644 activity_log.</div>` : "";
-    const banner = failTxt + (serverState === "ok" ? '<div class="tm-act-banner ok">\u2705 \u0627\u0644\u0633\u062C\u0644 \u0645\u062D\u0641\u0648\u0638 \u0639\u0644\u0649 \u0627\u0644\u0633\u064A\u0631\u0641\u0631 \u0648\u064A\u062A\u062D\u062F\u0651\u062B \u0645\u0639 \u0643\u0644 \u062D\u0631\u0643\u0629 \u062C\u062F\u064A\u062F\u0629.' + pend + "</div>" : serverState === "missing" ? '<div class="tm-act-banner warn"><b>\u0627\u0644\u0633\u062C\u0644 \u0627\u0644\u0645\u062D\u0641\u0648\u0638 \u0644\u0633\u0647 \u0645\u0634 \u0645\u0641\u0639\u0651\u0644.</b> \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u062C\u062F\u064A\u062F\u0629 \u0628\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0641\u064A \u0627\u0644\u062C\u0644\u0633\u0629 \u0627\u0644\u062D\u0627\u0644\u064A\u0629 \u0628\u0633. \u0644\u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u062D\u0641\u0638 \u0627\u0644\u062F\u0627\u0626\u0645 \u0634\u063A\u0651\u0644 \u0645\u0644\u0641 activity_log_setup.sql \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629 \u0641\u064A Supabase. \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u0642\u062F\u064A\u0645\u0629 \u0647\u0646\u0627 \u0645\u0633\u062A\u062E\u0631\u062C\u0629 \u0645\u0646 \u0627\u0644\u0641\u0648\u0627\u062A\u064A\u0631 \u0648\u0627\u0644\u0645\u0646\u062A\u062C\u0627\u062A \u0648\u0627\u0644\u0639\u0645\u0644\u0627\u0621 \u0627\u0644\u0645\u0633\u062C\u0644\u0629.</div>' : '<div class="tm-act-banner warn">\u23F3 \u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0648\u0635\u0648\u0644 \u0644\u0644\u0633\u062C\u0644 \u0627\u0644\u0645\u062D\u0641\u0648\u0638 \u062F\u0644\u0648\u0642\u062A\u064A (' + esc(lastFlushError || "\u063A\u064A\u0631 \u0645\u062A\u0635\u0644") + "). \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u062C\u062F\u064A\u062F\u0629 \u0645\u062D\u0641\u0648\u0638\u0629 \u0639\u0644\u0649 \u0627\u0644\u062C\u0647\u0627\u0632 \u0648\u0647\u062A\u062A\u0628\u0639\u062A \u0644\u0645\u0627 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u064A\u0631\u062C\u0639." + pend + "</div>");
+    const failTxt = failed.length ? `<div class="tm-act-banner warn">\u26A0\uFE0F ${failed.length} \u062D\u0631\u0643\u0629 \u0631\u0641\u0636\u0647\u0627 \u0627\u0644\u0633\u064A\u0631\u0641\u0631 \u0648\u0644\u0645 \u062A\u064F\u062D\u0641\u0638 (${esc(failed[failed.length - 1].err || "")}). \u0631\u0627\u062C\u0639 \u0635\u0644\u0627\u062D\u064A\u0627\u062A \u062C\u062F\u0648\u0644 activity_log.<div style="display:flex;gap:8px;margin-top:8px"><button type="button" id="tmActRetryFail" style="border:1px solid #f59e0b;background:#fff;border-radius:8px;padding:6px 12px;font-family:inherit;font-weight:700;cursor:pointer">\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629</button><button type="button" id="tmActDropFail" style="border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:6px 12px;font-family:inherit;font-weight:700;cursor:pointer">\u062A\u062C\u0627\u0647\u0644</button></div></div>` : "";
+    const banner = failTxt + (serverState === "ok" ? '<div class="tm-act-banner ok">\u2705 \u0627\u0644\u0633\u062C\u0644 \u0645\u062D\u0641\u0648\u0638 \u0639\u0644\u0649 \u0627\u0644\u0633\u064A\u0631\u0641\u0631 \u0648\u064A\u062A\u062D\u062F\u0651\u062B \u0645\u0639 \u0643\u0644 \u062D\u0631\u0643\u0629 \u062C\u062F\u064A\u062F\u0629.' + pend + "</div>" : serverState === "missing" ? '<div class="tm-act-banner warn"><b>\u0627\u0644\u0633\u062C\u0644 \u0627\u0644\u0645\u062D\u0641\u0648\u0638 \u0644\u0633\u0647 \u0645\u0634 \u0645\u0641\u0639\u0651\u0644.</b> \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u062C\u062F\u064A\u062F\u0629 \u0628\u062A\u0638\u0647\u0631 \u0647\u0646\u0627 \u0641\u064A \u0627\u0644\u062C\u0644\u0633\u0629 \u0627\u0644\u062D\u0627\u0644\u064A\u0629 \u0628\u0633. \u0644\u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u062D\u0641\u0638 \u0627\u0644\u062F\u0627\u0626\u0645 \u0634\u063A\u0651\u0644 \u0645\u0644\u0641 activity_log_setup.sql \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629 \u0641\u064A Supabase. \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u0642\u062F\u064A\u0645\u0629 \u0647\u0646\u0627 \u0645\u0633\u062A\u062E\u0631\u062C\u0629 \u0645\u0646 \u0627\u0644\u0641\u0648\u0627\u062A\u064A\u0631 \u0648\u0627\u0644\u0645\u0646\u062A\u062C\u0627\u062A \u0648\u0627\u0644\u0639\u0645\u0644\u0627\u0621 \u0627\u0644\u0645\u0633\u062C\u0644\u0629.</div>' : '<div class="tm-act-banner warn">\u23F3 \u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0648\u0635\u0648\u0644 \u0644\u0644\u0633\u062C\u0644 \u0627\u0644\u0645\u062D\u0641\u0648\u0638 \u062F\u0644\u0648\u0642\u062A\u064A (' + esc(lastFlushError || "\u063A\u064A\u0631 \u0645\u062A\u0635\u0644") + "). \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0627\u0644\u062C\u062F\u064A\u062F\u0629 \u0645\u062D\u0641\u0648\u0638\u0629 \u0639\u0644\u0649 \u0627\u0644\u062C\u0647\u0627\u0632 \u0648\u0647\u062A\u062A\u0628\u0639\u062A \u0644\u0645\u0627 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u064A\u0631\u062C\u0639." + pend + (failSince && Date.now() - failSince >= 3e5 ? " <b>\u26A0\uFE0F \u0627\u0644\u062D\u0641\u0638 \u0639\u0644\u0649 \u0627\u0644\u0633\u064A\u0631\u0641\u0631 \u0645\u062A\u0639\u0637\u0651\u0644 \u0645\u0646\u0630 " + Math.floor((Date.now() - failSince) / 6e4) + " \u062F\u0642\u064A\u0642\u0629 \u2014 \u0627\u0644\u062D\u0631\u0643\u0627\u062A \u0645\u062D\u0641\u0648\u0638\u0629 \u0639\u0644\u0649 \u0627\u0644\u062C\u0647\u0627\u0632\u060C \u0643\u0644\u0651\u0645 \u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0644\u0648 \u0627\u0633\u062A\u0645\u0631\u062A.</b>" : "") + "</div>");
     let html = banner;
     html += `<div class="tm-act-filters"><input id="tmActQ" type="search" placeholder="\u{1F50D} \u0627\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u062D\u0631\u0643\u0627\u062A" value="${esc(state.q)}">`;
     html += `<select id="tmActUser"><option value="">\u0643\u0644 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646</option>${users.map((u) => `<option ${u === state.user ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>`;
@@ -22016,6 +22035,16 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     });
     root.querySelector("#tmActRefresh").addEventListener("click", async () => {
       await refreshActivity();
+    });
+    const rf = root.querySelector("#tmActRetryFail");
+    if (rf) rf.addEventListener("click", () => {
+      retryFailedActivity();
+      renderActivity();
+    });
+    const df = root.querySelector("#tmActDropFail");
+    if (df) df.addEventListener("click", () => {
+      dismissFailedActivity();
+      renderActivity();
     });
   }
   async function refreshActivity() {
@@ -23012,6 +23041,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     } catch (e) {
     }
     if (ap.queued > 0 || ap.failed > 0) {
+      if (ap.stuckMin >= 5) txt += " \xB7 \u26A0\uFE0F \u0627\u0644\u062D\u0641\u0638 \u0645\u062A\u0639\u0637\u0651\u0644 \u0645\u0646\u0630 " + ap.stuckMin + " \u062F";
       txt += " \xB7 \u{1F4DD} " + (ap.queued + ap.failed) + " \u062D\u0631\u0643\u0629 \u0644\u0645 \u062A\u064F\u0633\u062C\u064E\u0651\u0644 \u0628\u0639\u062F";
       if (cls === "ok") cls = "warn";
     }
