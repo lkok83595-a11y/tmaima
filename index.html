@@ -7830,7 +7830,7 @@ img,video,canvas,svg{max-width:100%}
     <button type="button" class="lv-toggle" id="lvToggle">معاينة الفاتورة الحية ▾</button>
     <div class="lv-sheet" id="lvSheet"></div>
     <div class="lv-zoom"><span>🔍</span><input type="range" class="inv-scale" min="50" max="130" step="5" value="100" aria-label="تكبير / تصغير الفاتورة"><b class="inv-scale-v">100%</b></div>
-    <div class="lv-actions" id="lvActions"><button type="button" class="lv-b lv-b-x" id="lvClose">✕ إغلاق</button><button type="button" class="lv-b lv-b-q" id="lvQr">📲 QR</button><button type="button" class="lv-b lv-b-p" id="lvPrint">🖨️ طباعة / PDF</button><button type="button" class="lv-b lv-b-n" id="lvNew">➕ فاتورة جديدة</button></div>
+    <div class="lv-actions" id="lvActions"><button type="button" class="lv-b lv-b-x" id="lvClose">✕ إغلاق</button><button type="button" class="lv-b lv-b-p" id="lvPrint">🖨️ طباعة / PDF</button><button type="button" class="lv-b lv-b-n" id="lvNew">➕ فاتورة جديدة</button></div>
   </div>
   <div class="inv-form-card cw-card">
    <div class="inv-form-card-inner cw-step on" data-s="1">
@@ -8571,7 +8571,7 @@ img,video,canvas,svg{max-width:100%}
       </div>
       <div class="mb-bottom">
         <div class="mb-codes" id="prmQrNotes">
-          <div id="prmQrBox"><div id="prmQrCanvas" class="mb-qr"></div><div class="prm-bc-num" id="prmBcNum"></div></div>
+          
         </div>
         <div class="mb-sig"><div id="prmSigName" dir="auto">Tmima Shoes</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div>
       </div>
@@ -8582,7 +8582,6 @@ img,video,canvas,svg{max-width:100%}
     <div class="inv-print-actions" style="flex-wrap:wrap;align-items:center">
       <div class="lv-zoom lv-zoom-m"><span>🔍</span><input type="range" class="inv-scale" min="50" max="130" step="5" value="100" aria-label="تكبير / تصغير الفاتورة"><b class="inv-scale-v">100%</b></div>
       <button class="btn-close-print" data-h="s111">✕ إغلاق</button>
-      <button class="btn-close-print" id="btnInvQr" data-h="s112" style="color:var(--blue);border-color:var(--blue)">📲 QR</button>
       <button class="btn-close-print" id="btnInvWa" data-h="swa1" style="color:#128c4a;border-color:#25d366">💬 واتساب</button>
       <button class="btn-do-print" data-h="s113">🖨️ طباعة / PDF</button>
     </div>
@@ -27346,10 +27345,9 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         <div class="mb-sum-r mb-paidline"><span>Amount Paid</span><span>${nf(paid)}</span></div><div class="mb-sum-r mb-paidline"><span>Balance</span><span>${nf(rest)}</span></div>
       </div>
       <div class="mb-rem"><div class="mb-rem-h">Remarks</div><div class="mb-rem-t" dir="auto">${esc3(policy)}</div>${notes ? `<div class="mb-rem-t" dir="auto">${esc3(notes)}</div>` : ""}</div>
-      <div class="mb-bottom"><div class="mb-codes"><div class="mb-qr" id="lvQr"></div></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
+      <div class="mb-bottom"><div class="mb-codes"></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
       <div class="mb-tag" dir="auto">${esc3((s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644")}</div>
       <div class="mb-wm" style="background-image:${s.logoData ? `url('${s.logoData}')` : "none"}"></div>${grand > 0 && rest <= 0.004 ? `<div class="mb-stamp">PAID</div>` : ""}`;
-    swDrawQr(document.getElementById("lvQr"), swQrText(numTxt, dtxt, client, grand, paid, rest));
   }
   (function lvInit() {
     const view = document.getElementById("invCreateView");
@@ -27428,7 +27426,6 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   (function lvActionsInit() {
     const on = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener("click", fn); };
     on("lvPrint", () => printInvoiceOnly());
-    on("lvQr", () => showInvQr());
     on("lvClose", () => cwCancel());
     on("lvNew", () => { lvExitSaved(); invUI.view = "home"; invOpenCreate(); });
   })();
@@ -28162,10 +28159,6 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const tg = document.getElementById("prmTag");
     if (tg) tg.textContent = (s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644";
     document.getElementById("prmSigName").textContent = s.sigName || "Tmima Shoes";
-    const qrBox0 = document.getElementById("prmQrBox");
-    if (qrBox0) qrBox0.style.display = "";
-    swDrawQr(document.getElementById("prmQrCanvas"), swQrText(numTxt, inv2.date || "", inv2.client, grandShown, paidNow, Math.max(0, grandShown - paidNow)));
-    const bn = document.getElementById("prmBcNum"); if (bn) bn.textContent = "";
     applyInvScale(getInvScale());
     return true;
   }
