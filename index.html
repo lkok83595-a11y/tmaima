@@ -6727,9 +6727,8 @@ body:has(#pg-inventory.active) .mob-fab {
   display: none;
 }
 #pg-settings[data-sec=store] #setSec-store,
-#pg-settings[data-sec=look] #setSec-look,
-#pg-settings[data-sec=inv] #setSec-inv,
-#pg-settings[data-sec=prev] #setSec-prev {
+#pg-settings[data-sec=bk] #setSec-bk,
+#pg-settings[data-sec=inv] #setSec-inv {
   display: block;
 }
 #pg-settings .set-card {
@@ -6765,7 +6764,7 @@ body:has(#pg-inventory.active) .mob-fab {
   gap: 10px;
   margin-top: 6px;
 }
-#pg-settings[data-sec=prev] .set-save {
+#pg-settings[data-sec=bk] .set-save {
   display: none;
 }
 #pg-settings .set-save button {
@@ -8118,7 +8117,7 @@ img,video,canvas,svg{max-width:100%}
 
 <div class="page" id="pg-settings" data-sec="store">
  <div class="set-wrap">
-  <div class="set-menu"><div class="set-menu-t">⚙️ الإعدادات</div><button type="button" class="set-it" data-act="set-go" data-sec="store"><span class="set-ic">🏪</span><span class="set-tx"><b>بيانات المتجر</b><small>الاسم، التليفون، العنوان</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="look"><span class="set-ic">🎨</span><span class="set-tx"><b>شكل الفاتورة</b><small>اللوجو واللون</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="inv"><span class="set-ic">🧾</span><span class="set-tx"><b>إعدادات الفاتورة</b><small>الرقم، الملاحظة، التوقيع</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="prev"><span class="set-ic">👁️</span><span class="set-tx"><b>معاينة الفاتورة</b><small>شوف شكلها النهائي</small></span><span class="set-ch">‹</span></button></div>
+  <div class="set-menu"><div class="set-menu-t">⚙️ الإعدادات</div><button type="button" class="set-it" data-act="set-go" data-sec="store"><span class="set-ic">🏪</span><span class="set-tx"><b>بيانات المتجر</b><small>الاسم، التليفون، العنوان</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="inv"><span class="set-ic">🧾</span><span class="set-tx"><b>الفاتورة</b><small>اللوجو، الملاحظة، التوقيع، الاسترجاع</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" id="setBkMenu" data-act="set-go" data-sec="bk"><span class="set-ic">💾</span><span class="set-tx"><b>نسخة احتياطية</b><small>تصدير واستيراد البيانات</small></span><span class="set-ch">‹</span></button></div>
   <div class="set-body">
    <div class="set-head"><button type="button" class="sv-back" data-act="set-back" aria-label="رجوع">›</button><div class="set-title" id="setTitle">بيانات المتجر</div></div>
    <div class="set-sec" id="setSec-store"><div class="form-card set-card">
@@ -8152,16 +8151,9 @@ img,video,canvas,svg{max-width:100%}
         <div class="ff">
           <label>البريد الإلكتروني (اختياري)</label>
           <input type="text" id="st_email" placeholder="info@example.com">
-        </div></div></div></div><div class="set-sec" id="setSec-look"><div class="form-card set-card">
+        </div></div></div></div><div class="set-sec" id="setSec-inv"><div class="form-card set-card">
       <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="ff">
-          <label>اللون الرئيسي للفاتورة</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="color" id="st_color" value="#1e3a5f" style="width:48px;height:40px;border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:none">
-            <input type="text" id="st_color_hex" value="#1e3a5f" placeholder="#1e3a5f" style="flex:1" data-h="s117">
-          </div>
-        </div>
-        <div class="ff">
+<div class="ff">
           <label>لوجو المتجر (صورة)</label>
           <div style="display:flex;align-items:center;gap:12px">
             <div id="st_logo_preview" data-h="s118" style="width:64px;height:64px;border-radius:12px;border:2px dashed var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .2s" title="اضغط لرفع صورة">🏪</div>
@@ -8174,24 +8166,11 @@ img,video,canvas,svg{max-width:100%}
           </div>
         </div>
         <div class="ff">
-          <label>أيقونة المتجر (Emoji) — تظهر لو مفيش لوجو</label>
+          <label>بديل اللوجو (إيموجي) — يظهر لو مفيش لوجو</label>
           <input type="text" id="st_emoji" placeholder="🏪" maxlength="2" style="font-size:24px;text-align:center;width:70px">
         </div>
         
-        <div>
-          <label style="font-size:11px;color:var(--ink-faint);font-weight:700;display:block;margin-bottom:6px">معاينة هيدر الفاتورة</label>
-          <div id="st_color_preview" style="border-radius:10px;padding:14px 18px;color:#fff;font-weight:900;font-size:14px;transition:background .3s">
-            <div style="font-size:11px;opacity:.6;margin-bottom:4px">INVOICE · فاتورة</div>
-            <div>#INV-0001 &nbsp;|&nbsp; <span id="st_preview_name">شركة تميمة شوز</span></div>
-          </div>
-        </div>
-      </div>
-    </div></div><div class="set-sec" id="setSec-inv"><div class="form-card set-card">
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="ff">
-          <label>بادئة رقم الفاتورة</label>
-          <input type="text" id="st_inv_prefix" placeholder="INV" style="width:120px">
-        </div>
+        
         <div class="ff">
           <label>ملاحظة افتراضية على الفاتورة</label>
           <input type="text" id="st_inv_note" placeholder="شكراً لثقتك بنا">
@@ -8204,20 +8183,31 @@ img,video,canvas,svg{max-width:100%}
           <label>سياسة الاسترجاع (تظهر في أسفل الفاتورة)</label>
           <textarea id="st_return_policy" rows="3" placeholder="مثال: الاسترجاع خلال 7 أيام بفاتورة أصلية" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:13px;color:var(--ink);background:var(--surface);outline:none;resize:vertical;width:100%;transition:border-color .2s" data-h="s122" data-h="s123"></textarea>
         </div>
-        <div class="ff">
+<div class="ff">
+          <label>بادئة رقم الفاتورة (نادراً ما تتغير)</label>
+          <input type="text" id="st_inv_prefix" placeholder="INV" style="width:120px">
+        </div>
+              </div>
+    </div></div><div class="set-sec" id="setSec-bk"><div class="form-card set-card"><div style="display:flex;flex-direction:column;gap:12px"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;line-height:1.7">احفظ نسخة من بيانات المحل على جهازك، أو ارجع بيانات من نسخة قديمة.</div><button type="button" data-h="s9" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">💾 تصدير نسخة احتياطية</button><button type="button" data-h="s10" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">📥 استيراد نسخة</button></div></div></div><div id="setLegacy" hidden style="display:none"><div class="ff">
+          <label>اللون الرئيسي للفاتورة</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="color" id="st_color" value="#1e3a5f" style="width:48px;height:40px;border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:none">
+            <input type="text" id="st_color_hex" value="#1e3a5f" placeholder="#1e3a5f" style="flex:1" data-h="s117">
+          </div>
+        </div><div><div id="st_color_preview" style="border-radius:10px;padding:14px 18px;color:#fff;font-weight:900;font-size:14px;transition:background .3s">
+            <div style="font-size:11px;opacity:.6;margin-bottom:4px">INVOICE · فاتورة</div>
+            <div>#INV-0001 &nbsp;|&nbsp; <span id="st_preview_name">شركة تميمة شوز</span></div>
+          </div></div><div class="ff">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
             <input type="checkbox" id="st_show_qr" style="width:16px;height:16px;cursor:pointer">
             إظهار QR على الفاتورة
           </label>
-        </div>
-        <div class="ff">
+        </div><div class="ff">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
             <input type="checkbox" id="st_show_barcode" checked style="width:16px;height:16px;cursor:pointer">
             إظهار Barcode على الفاتورة
           </label>
-        </div>
-      </div>
-    </div></div><div class="set-sec" id="setSec-prev"><div class="form-card set-card">
+        </div><div class="set-sec" id="setSec-prev-old"><div class="form-card set-card">
       <div id="st_inv_preview_wrap" style="border:2px dashed var(--border);border-radius:12px;overflow:hidden;background:#fff">
         
         <div id="prev_header" style="padding:20px 24px 16px;display:flex;align-items:flex-start;justify-content:space-between;background:linear-gradient(135deg,#1e3a5f,#2d5986)">
@@ -8285,7 +8275,7 @@ img,video,canvas,svg{max-width:100%}
           </div>
         </div>
       </div>
-    </div></div>
+    </div></div></div>
    <div class="set-save" id="setSave"><button type="button" class="cw-prev" data-act="set-cancel">إلغاء</button><button type="button" class="btn-add set-savebtn" data-act="set-save">💾 حفظ</button></div>
   </div>
  </div>
@@ -24926,7 +24916,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       }
       lb.style.display = any ? "" : "none";
     });
-    ["navExport", "navImport"].forEach((id) => {
+    ["navExport", "navImport", "setBkMenu"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.style.display = can("users") ? "" : "none";
     });
@@ -27874,7 +27864,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }
     return Object.assign({}, STORE_DEFAULTS, s);
   }
-  var SET_TITLES = { store: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062A\u062C\u0631", look: "\u0634\u0643\u0644 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629", inv: "\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629", prev: "\u0645\u0639\u0627\u064A\u0646\u0629 \u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629" };
+  var SET_TITLES = { store: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062A\u062C\u0631", inv: "\u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629", bk: "\u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" };
   function setGo(sec, reset) {
     const pg = document.getElementById("pg-settings");
     if (!pg) return;
