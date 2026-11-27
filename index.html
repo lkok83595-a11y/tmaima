@@ -7244,6 +7244,13 @@ img,video,canvas,svg{max-width:100%}
 }
 
 </style>
+<style id="drawerFix">
+@media(max-width:768px){
+  .sidebar{height:100vh;height:100dvh;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .sidebar-overlay{touch-action:none;overscroll-behavior:contain}
+  body:has(.sidebar.open){overflow:hidden;overscroll-behavior:none}
+}
+</style>
 </head>
 <body>
 
