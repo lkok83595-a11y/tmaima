@@ -6728,6 +6728,7 @@ body:has(#pg-inventory.active) .mob-fab {
 }
 #pg-settings[data-sec=store] #setSec-store,
 #pg-settings[data-sec=bk] #setSec-bk,
+#pg-settings[data-sec=lbl] #setSec-lbl,
 #pg-settings[data-sec=inv] #setSec-inv {
   display: block;
 }
@@ -8117,7 +8118,7 @@ img,video,canvas,svg{max-width:100%}
 
 <div class="page" id="pg-settings" data-sec="store">
  <div class="set-wrap">
-  <div class="set-menu"><div class="set-menu-t">⚙️ الإعدادات</div><button type="button" class="set-it" data-act="set-go" data-sec="store"><span class="set-ic">🏪</span><span class="set-tx"><b>بيانات المتجر</b><small>الاسم، التليفون، العنوان</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="inv"><span class="set-ic">🧾</span><span class="set-tx"><b>الفاتورة</b><small>اللوجو، الملاحظة، التوقيع، الاسترجاع</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" id="setBkMenu" data-act="set-go" data-sec="bk"><span class="set-ic">💾</span><span class="set-tx"><b>نسخة احتياطية</b><small>تصدير واستيراد البيانات</small></span><span class="set-ch">‹</span></button></div>
+  <div class="set-menu"><div class="set-menu-t">⚙️ الإعدادات</div><button type="button" class="set-it" data-act="set-go" data-sec="store"><span class="set-ic">🏪</span><span class="set-tx"><b>بيانات المتجر</b><small>الاسم، التليفون، العنوان</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="inv"><span class="set-ic">🧾</span><span class="set-tx"><b>الفاتورة</b><small>اللوجو، الملاحظة، التوقيع، الاسترجاع</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" data-act="set-go" data-sec="lbl"><span class="set-ic">🏷️</span><span class="set-tx"><b>ملصق الباركود</b><small>مقاس الملصق للطباعة</small></span><span class="set-ch">‹</span></button><button type="button" class="set-it" id="setBkMenu" data-act="set-go" data-sec="bk"><span class="set-ic">💾</span><span class="set-tx"><b>نسخة احتياطية</b><small>تصدير واستيراد البيانات</small></span><span class="set-ch">‹</span></button></div>
   <div class="set-body">
    <div class="set-head"><button type="button" class="sv-back" data-act="set-back" aria-label="رجوع">›</button><div class="set-title" id="setTitle">بيانات المتجر</div></div>
    <div class="set-sec" id="setSec-store"><div class="form-card set-card">
@@ -8188,7 +8189,7 @@ img,video,canvas,svg{max-width:100%}
           <input type="text" id="st_inv_prefix" placeholder="INV" style="width:120px">
         </div>
               </div>
-    </div></div><div class="set-sec" id="setSec-bk"><div class="form-card set-card"><div style="display:flex;flex-direction:column;gap:12px"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;line-height:1.7">احفظ نسخة من بيانات المحل على جهازك، أو ارجع بيانات من نسخة قديمة.</div><button type="button" data-h="s9" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">💾 تصدير نسخة احتياطية</button><button type="button" data-h="s10" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">📥 استيراد نسخة</button></div></div></div><div id="setLegacy" hidden style="display:none"><div class="ff">
+    </div></div><div class="set-sec" id="setSec-lbl"><div class="form-card set-card"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;line-height:1.7;margin-bottom:6px">مقاس الاستيكر (بالملّي). بيتحفظ لكل الأجهزة وبيتستخدم في الطباعة الفردية والجماعية والتجريبية.</div><div class="ff"><label>العرض (mm)</label><input type="number" id="st_lbl_w" value="40" min="20" max="120" step="1" inputmode="decimal" style="width:140px"></div><div class="ff"><label>الارتفاع (mm)</label><input type="number" id="st_lbl_h" value="30" min="10" max="120" step="1" inputmode="decimal" style="width:140px"></div><div class="ff"><label>الفجوة بين الاستيكرات (mm)</label><input type="number" id="st_lbl_gap" value="3" min="0" max="10" step="1" inputmode="decimal" style="width:140px"></div></div></div></div><div class="set-sec" id="setSec-bk"><div class="form-card set-card"><div style="display:flex;flex-direction:column;gap:12px"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;line-height:1.7">احفظ نسخة من بيانات المحل على جهازك، أو ارجع بيانات من نسخة قديمة.</div><button type="button" data-h="s9" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">💾 تصدير نسخة احتياطية</button><button type="button" data-h="s10" style="background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:10px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">📥 استيراد نسخة</button></div></div></div><div id="setLegacy" hidden style="display:none"><div class="ff">
           <label>اللون الرئيسي للفاتورة</label>
           <div style="display:flex;align-items:center;gap:10px">
             <input type="color" id="st_color" value="#1e3a5f" style="width:48px;height:40px;border:2px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:none">
@@ -25852,9 +25853,17 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     </div>`;
     }).join("");
   }
-  var LABEL_W_MM = 76;
-  var LABEL_H_MM = 51;
+  var LABEL_W_MM = 40;
+  var LABEL_H_MM = 30;
   var LABEL_GAP = 3;
+  function getLabelSize() {
+    const s = getStoreSettings();
+    const n = (v, lo, hi, d) => {
+      v = parseFloat(v);
+      return v >= lo && v <= hi ? v : d;
+    };
+    return { w: n(s.labelW, 20, 120, LABEL_W_MM), h: n(s.labelH, 10, 120, LABEL_H_MM), gap: n(s.labelGap, 0, 10, LABEL_GAP) };
+  }
   var LABEL_SPEED = 4;
   var LABEL_DENSITY = 8;
   var btDevice = null;
@@ -25863,9 +25872,10 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   var BT_SERVICE = "000018f0-0000-1000-8000-00805f9b34fb";
   var BT_CHAR = "00002af1-0000-1000-8000-00805f9b34fb";
   function buildTSPL(name, price, code, wMM, hMM, gapMM) {
-    wMM = wMM || LABEL_W_MM;
-    hMM = hMM || LABEL_H_MM;
-    gapMM = gapMM || LABEL_GAP;
+    const _ls = getLabelSize();
+    wMM = wMM || _ls.w;
+    hMM = hMM || _ls.h;
+    gapMM = gapMM || _ls.gap;
     const W = Math.round(wMM * 8);
     const H = Math.round(hMM * 8);
     const M = 24;
@@ -26113,20 +26123,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
 
       <!-- \u0627\u0644\u0645\u0639\u0627\u064A\u0646\u0629 HTML \u0645\u0628\u0627\u0634\u0631\u0629 -->
       <div style="padding:16px;background:#f8fafc;display:flex;justify-content:center">
-        <div id="labelPreviewBox" style="
-          background:#fff;
-          border:2px solid #222;
-          border-radius:8px;
-          padding:10px 12px;
-          width:260px;
-          font-family:monospace;
-          box-shadow:0 4px 16px rgba(0,0,0,.12);
-        ">
-          <div id="lpName" style="font-size:13px;font-weight:900;color:#111;margin-bottom:6px;word-break:break-all">${name}</div>
-          <div id="lpPrice" style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;display:${price ? "block" : "none"}">${price}</div>
-          <div id="lpBarcode" style="margin-bottom:4px"></div>
-          <div id="lpCode" style="font-size:11px;color:#555;text-align:center">${code}</div>
-        </div>
+        <div id="labelPreviewBox" style="background:#fff;border:1px solid #222;line-height:0;box-shadow:0 4px 16px rgba(0,0,0,.12);width:300px;max-width:100%"><div id="lpSvg"></div><div id="lpCap" style="line-height:1.4;font-size:10px;color:#64748b;text-align:center;padding:4px;background:#f8fafc;border-top:1px solid #e2e8f0;font-family:Cairo,sans-serif"></div></div>
       </div>
 
       <!-- \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0637\u0628\u0627\u0639\u0629 -->
@@ -26138,7 +26135,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
             <div>
               <div style="font-size:10px;color:#9ca3af;font-weight:700;margin-bottom:3px">\u0627\u0644\u0639\u0631\u0636</div>
-              <input type="number" id="lblW" value="${LABEL_W_MM}" min="20" max="120" step="1"
+              <input type="number" id="lblW" value="${getLabelSize().w}" min="20" max="120" step="1"
                 data-h="${__hd("input", function(event, P0) {
       refreshLabelPreview(P0);
     }, p.id)}"
@@ -26148,7 +26145,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
             </div>
             <div>
               <div style="font-size:10px;color:#9ca3af;font-weight:700;margin-bottom:3px">\u0627\u0644\u0627\u0631\u062A\u0641\u0627\u0639</div>
-              <input type="number" id="lblH" value="${LABEL_H_MM}" min="10" max="120" step="1"
+              <input type="number" id="lblH" value="${getLabelSize().h}" min="10" max="120" step="1"
                 data-h="${__hd("input", function(event, P0) {
       refreshLabelPreview(P0);
     }, p.id)}"
@@ -26158,7 +26155,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
             </div>
             <div>
               <div style="font-size:10px;color:#9ca3af;font-weight:700;margin-bottom:3px">\u0627\u0644\u0641\u062C\u0648\u0629</div>
-              <input type="number" id="lblGap" value="${LABEL_GAP}" min="0" max="10" step="1"
+              <input type="number" id="lblGap" value="${getLabelSize().gap}" min="0" max="10" step="1"
                 style="width:100%;border:1.5px solid #d1d5db;border-radius:8px;padding:6px 8px;
                        font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;font-weight:800;
                        text-align:center;outline:none">
@@ -26171,7 +26168,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
           <span style="font-size:10px;font-weight:800;color:#6b7280;align-self:center">\u062C\u0627\u0647\u0632\u0629:</span>
           <button data-h="${__hd("click", function(event, P0) {
       setLabelSize(40, 30, 3, P0);
-    }, p.id)}" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">40\xD730</button>
+    }, p.id)}" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">40\xD730 \u2713</button>
           <button data-h="${__hd("click", function(event, P0) {
       setLabelSize(50, 30, 3, P0);
     }, p.id)}" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">50\xD730</button>
@@ -26183,7 +26180,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }, p.id)}" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">80\xD750</button>
           <button data-h="${__hd("click", function(event, P0) {
       setLabelSize(76, 51, 3, P0);
-    }, p.id)}" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">76\xD751 \u2713</button>
+    }, p.id)}" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0;border-radius:6px;padding:4px 10px;font-family:'Cairo',-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;font-size:11px;font-weight:700;cursor:pointer">76\xD751</button>
         </div>
 
         <!-- \u0639\u062F\u062F \u0627\u0644\u0646\u0633\u062E -->
@@ -26239,7 +26236,45 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       if (e.target === modal) modal.remove();
     });
     document.body.appendChild(modal);
-    renderPreviewBarcode(code);
+    drawLabelPreview(p);
+  }
+  function drawLabelPreview(p) {
+    const host = document.getElementById("lpSvg");
+    if (!host) return;
+    const ls = getLabelSize();
+    const w = parseFloat(document.getElementById("lblW")?.value) || ls.w;
+    const h = parseFloat(document.getElementById("lblH")?.value) || ls.h;
+    const gap = parseFloat(document.getElementById("lblGap")?.value) || ls.gap;
+    const code = p.code || p.id.toString();
+    const name = p.name.length > 20 ? p.name.substring(0, 18) + ".." : p.name;
+    const price = p.sellPrice ? p.sellPrice.toFixed(2) + " EGP" : "";
+    const tspl = buildTSPL(name, price, code, w, h, gap);
+    const W = Math.round(w * 8), H = Math.round(h * 8);
+    const fonts = { "1": [8, 12], "2": [12, 20], "3": [16, 24], "4": [24, 32], "5": [32, 48] };
+    const esc4 = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    let out = "";
+    tspl.split(/\r?\n/).forEach((ln) => {
+      let m = ln.match(/^TEXT (\d+),(\d+),"(\w+)",\d+,(\d+),(\d+),"(.*)"$/);
+      if (m) {
+        const f = fonts[m[3]] || fonts["3"];
+        const cw = f[0] * Number(m[4]), ch = f[1] * Number(m[5]);
+        const t = m[6];
+        out += `<text x="${m[1]}" y="${Number(m[2]) + ch * 0.82}" font-family="Courier New,monospace" font-size="${ch * 0.95}" textLength="${t.length * cw}" lengthAdjust="spacingAndGlyphs" fill="#000">${esc4(t)}</text>`;
+        return;
+      }
+      m = ln.match(/^BARCODE (\d+),(\d+),"128",(\d+),\d+,\d+,(\d+),\d+,"(.*)"$/);
+      if (m) {
+        const bits = encodeCode128(m[5]);
+        if (!bits) return;
+        const nar = Number(m[4]);
+        for (let i = 0; i < bits.length; i++) {
+          if (bits[i] === "1") out += `<rect x="${Number(m[1]) + i * nar}" y="${m[2]}" width="${nar}" height="${m[3]}" fill="#000"/>`;
+        }
+      }
+    });
+    host.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" direction="ltr" style="display:block;background:#fff;direction:ltr">${out}</svg>`;
+    const cap = document.getElementById("lpCap");
+    if (cap) cap.textContent = w + " \xD7 " + h + " mm \u2014 \u0628\u0627\u0644\u0645\u0642\u064A\u0627\u0633";
   }
   function renderPreviewBarcode(code) {
     const container = document.getElementById("lpBarcode");
@@ -26411,21 +26446,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   function refreshLabelPreview(prodId) {
     const p = products.find((x) => x.id === prodId);
     if (!p) return;
-    const w = parseFloat(document.getElementById("lblW")?.value) || 50;
-    const h = parseFloat(document.getElementById("lblH")?.value) || 40;
-    const ratio = w / h;
-    const box = document.getElementById("labelPreviewBox");
-    if (box) box.style.height = Math.round(260 / ratio) + "px";
-    const code = p.code || p.id.toString();
-    const price = p.sellPrice ? p.sellPrice.toFixed(2) + " EGP" : "";
-    const lpPrice = document.getElementById("lpPrice");
-    if (lpPrice) {
-      lpPrice.textContent = price;
-      lpPrice.style.display = price ? "block" : "none";
-    }
-    const lpCode = document.getElementById("lpCode");
-    if (lpCode) lpCode.textContent = code;
-    renderPreviewBarcode(code);
+    drawLabelPreview(p);
   }
   async function confirmPrintLabel(prodId) {
     {
@@ -26433,9 +26454,10 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       if (__p) logActivity({ action: "print", entity: "barcode", entity_id: prodId, summary: `\u0637\u0628\u0639 \u0645\u0644\u0635\u0642 \u0628\u0627\u0631\u0643\u0648\u062F \u0644\u0644\u0645\u0646\u062A\u062C \xAB${__p.name}\xBB` });
     }
     const qty = parseInt(document.getElementById("labelQtyInput")?.value) || 1;
-    const w = parseFloat(document.getElementById("lblW")?.value) || LABEL_W_MM;
-    const h = parseFloat(document.getElementById("lblH")?.value) || LABEL_H_MM;
-    const gap = parseFloat(document.getElementById("lblGap")?.value) || LABEL_GAP;
+    const _ls = getLabelSize();
+    const w = parseFloat(document.getElementById("lblW")?.value) || _ls.w;
+    const h = parseFloat(document.getElementById("lblH")?.value) || _ls.h;
+    const gap = parseFloat(document.getElementById("lblGap")?.value) || _ls.gap;
     document.getElementById("labelPreviewModal")?.remove();
     const p = products.find((x) => x.id === prodId);
     if (!p) return;
@@ -26552,9 +26574,10 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     showToast(`\u2705 \u062A\u0645\u062A \u0637\u0628\u0627\u0639\u0629 ${selected.length} \u0645\u0646\u062A\u062C`);
   }
   async function testPrint() {
-    const w = parseFloat(document.getElementById("lblW")?.value) || 50;
-    const h = parseFloat(document.getElementById("lblH")?.value) || 40;
-    const g = parseFloat(document.getElementById("lblGap")?.value) || 3;
+    const _ls = getLabelSize();
+    const w = parseFloat(document.getElementById("lblW")?.value) || _ls.w;
+    const h = parseFloat(document.getElementById("lblH")?.value) || _ls.h;
+    const g = parseFloat(document.getElementById("lblGap")?.value) || _ls.gap;
     const tspl = buildTSPL("TEST PRODUCT", "99.00 EGP", "12345", w, h, g);
     showToast("\u{1F9EA} \u062C\u0627\u0631\u064A \u0625\u0631\u0633\u0627\u0644 \u062A\u0633\u062A...");
     const ok = await sendToPrinter(tspl);
@@ -27865,7 +27888,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     }
     return Object.assign({}, STORE_DEFAULTS, s);
   }
-  var SET_TITLES = { store: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062A\u062C\u0631", inv: "\u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629", bk: "\u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" };
+  var SET_TITLES = { store: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062A\u062C\u0631", inv: "\u0627\u0644\u0641\u0627\u062A\u0648\u0631\u0629", lbl: "\u0645\u0644\u0635\u0642 \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062F", bk: "\u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629" };
   function setGo(sec, reset) {
     const pg = document.getElementById("pg-settings");
     if (!pg) return;
@@ -27907,6 +27930,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     setVal("st_inv_prefix", s.invPrefix || "INV");
     setVal("st_inv_note", s.invNote || "");
     setVal("st_sig_name", s.sigName || "");
+    { const _l = getLabelSize(); setVal("st_lbl_w", _l.w); setVal("st_lbl_h", _l.h); setVal("st_lbl_gap", _l.gap); }
     setVal("st_return_policy", (s.returnPolicy || "").trim() || DEFAULT_RETURN_POLICY);
     const qr = document.getElementById("st_show_qr");
     const bc = document.getElementById("st_show_barcode");
@@ -28032,6 +28056,9 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       invPrefix: g("st_inv_prefix") || "INV",
       invNote: g("st_inv_note"),
       sigName: g("st_sig_name"),
+      labelW: g("st_lbl_w"),
+      labelH: g("st_lbl_h"),
+      labelGap: g("st_lbl_gap"),
       returnPolicy: g("st_return_policy"),
       showQr: gc("st_show_qr"),
       showBarcode: gc("st_show_barcode")
@@ -28041,6 +28068,20 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       return;
     }
     delete s.color; delete s.showQr; delete s.showBarcode;
+    {
+      const num = (v, lo, hi) => {
+        v = parseFloat(v);
+        return v >= lo && v <= hi ? v : null;
+      };
+      const lw = num(s.labelW, 20, 120), lh = num(s.labelH, 10, 120), lg = num(s.labelGap, 0, 10);
+      if (lw === null || lh === null || lg === null) {
+        showToast("\u26A0\uFE0F \u0645\u0642\u0627\u0633 \u0627\u0644\u0645\u0644\u0635\u0642 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D (\u0627\u0644\u0639\u0631\u0636 20-120\u060C \u0627\u0644\u0627\u0631\u062A\u0641\u0627\u0639 10-120\u060C \u0627\u0644\u0641\u062C\u0648\u0629 0-10). \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0645\u0627\u062A\u062D\u0641\u0638\u062A\u0634");
+        return;
+      }
+      s.labelW = lw;
+      s.labelH = lh;
+      s.labelGap = lg;
+    }
     try {
       const raw = JSON.parse(localStorage.getItem(SK_SETTINGS) || "{}") || {};
       if (raw.logoData) s.logoData = raw.logoData;
@@ -28065,7 +28106,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     })();
   }
   var _stSaving = false;
-  var SHARED_KEYS = ["nameAr", "nameEn", "phone1", "phone2", "address", "website", "email", "emoji", "invPrefix", "invNote", "sigName", "returnPolicy", "logoData"];
+  var SHARED_KEYS = ["nameAr", "nameEn", "phone1", "phone2", "address", "website", "email", "emoji", "invPrefix", "invNote", "sigName", "returnPolicy", "logoData", "labelW", "labelH", "labelGap"];
   function askAdminPin() {
     return new Promise((resolve) => {
       const ov = document.createElement("div");
