@@ -8380,6 +8380,7 @@ img,video,canvas,svg{max-width:100%}
     </div>
     <!-- Scanner tools -->
     <div style="padding:8px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button type="button" id="bcSoundBtn" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔊</button>
       <button type="button" id="bcZoomBtn" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔍 1x</button>
       <button type="button" id="bcTorchBtn" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔦 فلاش</button>
       <input type="text" id="bcManualInput2" placeholder="أو اكتب الكود يدوياً..." autocomplete="off" style="flex:1;min-width:120px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 10px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;outline:none">
@@ -28970,6 +28971,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       showToast("\u26A0\uFE0F \u0645\u0643\u062A\u0628\u0629 \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062F \u0644\u0645 \u062A\u064F\u062D\u0645\u064E\u0651\u0644");
       return;
     }
+    bcAudioUnlock();
     document.getElementById("bcCamModal").style.display = "flex";
     document.getElementById("btnBcScanner").style.background = "linear-gradient(135deg,#059669,#047857)";
     document.getElementById("btnBcScanner").innerHTML = "\u{1F4F7} \u0627\u0644\u0633\u0643\u0627\u0646\u0631 \u0634\u063A\u0627\u0644";
@@ -29023,6 +29025,54 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       document.getElementById("bcCamStatus").textContent = "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0648\u0635\u0648\u0644 \u0644\u0644\u0643\u0627\u0645\u064A\u0631\u0627";
       showBcFallback();
       console.error(e);
+    }
+  }
+  var bcAudio = null;
+  function bcSoundOn() {
+    try {
+      return localStorage.getItem("bc_sound") !== "0";
+    } catch (e) {
+      return true;
+    }
+  }
+  function bcAudioUnlock() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!bcAudio) bcAudio = new AC();
+      if (bcAudio.state === "suspended") bcAudio.resume();
+    } catch (e) {
+    }
+  }
+  function bcTone(freq, dur, when, type) {
+    const ctx = bcAudio, t0 = ctx.currentTime + when;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(t0);
+    o.stop(t0 + dur + 0.02);
+  }
+  function bcBeep(ok) {
+    try {
+      if (!bcSoundOn()) return;
+      bcAudioUnlock();
+      if (!bcAudio) return;
+      const go = () => {
+        if (ok) bcTone(880, 0.12, 0, "square");
+        else {
+          bcTone(400, 0.09, 0, "triangle");
+          bcTone(400, 0.09, 0.15, "triangle");
+        }
+      };
+      if (bcAudio.state === "running") go();
+      else bcAudio.resume().then(go).catch(() => {
+      });
+    } catch (e) {
     }
   }
   async function startNativeScanner(cameraId) {
@@ -29226,6 +29276,22 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     };
   }
   function bindBcManual() {
+    const sb = document.getElementById("bcSoundBtn");
+    if (sb) {
+      sb.textContent = bcSoundOn() ? "\u{1F50A}" : "\u{1F507}";
+      sb.onclick = () => {
+        const on = !bcSoundOn();
+        try {
+          localStorage.setItem("bc_sound", on ? "1" : "0");
+        } catch (e) {
+        }
+        sb.textContent = on ? "\u{1F50A}" : "\u{1F507}";
+        if (on) {
+          bcAudioUnlock();
+          bcBeep(true);
+        }
+      };
+    }
     const mi = document.getElementById("bcManualInput2");
     const go = () => {
       const v = mi.value.trim();
@@ -29304,6 +29370,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       overlay0.style.display = "flex";
       setTimeout(() => overlay0.style.display = "none", 400);
       h(String(code).trim());
+      bcBeep(true);
       return;
     }
     const codeStr = String(code).trim();
@@ -29314,6 +29381,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     if (!p) {
       document.getElementById("bcCamStatus").textContent = "\u26A0\uFE0F \u0643\u0648\u062F \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F: " + code;
       showToast("\u26A0\uFE0F \u0645\u0641\u064A\u0634 \u0645\u0646\u062A\u062C \u0628\u0627\u0644\u0643\u0648\u062F: " + code);
+      bcBeep(false);
       return;
     }
     document.getElementById("bcLastScan").style.display = "block";
@@ -29321,12 +29389,14 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     document.getElementById("bcLastScanCode").textContent = "\u0643\u0648\u062F: " + code;
     document.getElementById("bcCamStatus").textContent = "\u2705 " + p.name;
     addProductToInvoice(p, 1).then((r) => {
+      bcBeep(!!r.added);
       const flash = document.getElementById("bcScanFlash");
       document.getElementById("bcScanFlashText").textContent = r.added ? "\u2705 " + p.name + (r.found ? " \u2014 \u0627\u0644\u0643\u0645\u064A\u0629 +1" : " \u2014 \u062A\u0645\u062A \u0627\u0644\u0625\u0636\u0627\u0641\u0629") : "\u26A0\uFE0F " + p.name + " \u2014 \u0645\u0634 \u0645\u062A\u0627\u062D \u0628\u0627\u0644\u0643\u0645\u064A\u0629 \u062F\u064A";
       flash.style.display = "flex";
       clearTimeout(flash._t);
       flash._t = setTimeout(() => flash.style.display = "none", 3e3);
     }).catch((e) => {
+      bcBeep(false);
       console.error(e);
       showToast("\u26A0\uFE0F \u062A\u0639\u0630\u0631 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0645\u0646\u062A\u062C \u0644\u0644\u0641\u0627\u062A\u0648\u0631\u0629");
     });
