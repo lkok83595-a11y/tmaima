@@ -1,6 +1,6 @@
 // Service worker: always loads the newest page from the network (bypassing the browser HTTP cache);
 // falls back to the saved copy only when offline. Bump VERSION on each deploy.
-const VERSION = "2026-11-27-9";
+const VERSION = "2026-11-27-10";
 const CACHE = "tamima-shell-" + VERSION;
 self.addEventListener("install", (e) => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
