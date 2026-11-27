@@ -8378,6 +8378,13 @@ img,video,canvas,svg{max-width:100%}
         <option>جاري التحميل...</option>
       </select>
     </div>
+    <!-- Scanner tools -->
+    <div style="padding:8px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button type="button" id="bcZoomBtn" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔍 1x</button>
+      <button type="button" id="bcTorchBtn" style="display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔦 فلاش</button>
+      <input type="text" id="bcManualInput2" placeholder="أو اكتب الكود يدوياً..." autocomplete="off" style="flex:1;min-width:120px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 10px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;outline:none">
+      <button type="button" id="bcManualBtn2" style="background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">إضافة</button>
+    </div>
     <!-- Last scan result -->
     <div id="bcLastScan" style="display:none;padding:10px 16px 14px;border-top:1px solid rgba(255,255,255,.08)">
       <div style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
@@ -25883,7 +25890,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const digits = /^\d+$/.test(cs);
     const symbols = digits ? 1 + Math.floor(cs.length / 2) + (cs.length % 2 ? 2 : 0) + 1 : cs.length + 2;
     const modules = 11 * symbols + 13;
-    const narrow = Math.max(1, Math.min(2, Math.floor((W - 2 * M) / (modules + 20))));
+    const narrow = Math.max(1, Math.min(3, Math.floor((W - 2 * M) / (modules + 20))));
     const bcW = modules * narrow;
     const codeTxt = "Code: " + code;
     const fit = (t) => String(t).length * 32 <= W - 2 * M ? 2 : 1;
@@ -25892,14 +25899,14 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     const hCode = 24 * mCode;
     const hPrice = price ? 24 * mPrice : 0;
     const gap = 10;
-    const bcH = 64;
     const offPrice = hCode + gap;
     const offBc = price ? offPrice + hPrice + gap + 4 : hCode + gap + 4;
-    const blockH = offBc + bcH;
+    const blockH = offBc + 64;
     const top = Math.max(M, Math.round((H - blockH) / 2));
     const codeY = top;
     const priceY = top + offPrice;
     const bcY = top + offBc;
+    const bcH = Math.max(32, Math.min(96, H - 16 - bcY));
     const cx = (t, m) => Math.max(M, Math.round((W - String(t).length * 16 * m) / 2));
     const bx = Math.max(M, Math.round((W - bcW) / 2));
     const lines = [
@@ -29020,6 +29027,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
   }
   async function startBcScanner(cameraId) {
     await stopBcScanner();
+    bindBcManual();
     const F = window.Html5QrcodeSupportedFormats;
     const cfgScan = { formatsToSupport: F ? [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39, F.QR_CODE] : void 0 };
     try {
@@ -29030,7 +29038,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
     try {
       await bcScanner.start(
         cameraId,
-        { fps: 15, qrbox: (w, h) => ({ width: Math.floor(w * 0.9), height: Math.floor(h * 0.55) }), aspectRatio: 1.333 },
+        { fps: 15, qrbox: (w, h) => ({ width: Math.floor(w * 0.95), height: Math.floor(h * 0.4) }), aspectRatio: 1.333, videoConstraints: { deviceId: { exact: cameraId }, width: { ideal: 1600 }, height: { ideal: 1200 } } },
         (code) => {
           if (bcCooldown || code === bcLastCode) return;
           bcLastCode = code;
@@ -29046,6 +29054,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         // suppress frame errors
       );
       bcRunning = true;
+      setupBcTools();
       document.getElementById("bcCamStatus").textContent = "\u0648\u062C\u0651\u0647 \u0639\u0644\u0649 \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062F";
     } catch (e) {
       document.getElementById("bcCamStatus").textContent = "\u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D\u0629";
@@ -29053,6 +29062,85 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
       console.error(e);
     }
   }
+  function bcTrack() {
+    try {
+      const v = document.querySelector("#bcCamVideo video");
+      return v && v.srcObject ? v.srcObject.getVideoTracks()[0] : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function setupBcTools() {
+    const tr = bcTrack();
+    const zb = document.getElementById("bcZoomBtn");
+    const tb = document.getElementById("bcTorchBtn");
+    const vid = document.getElementById("bcCamVideo");
+    zb.style.display = "none";
+    tb.style.display = "none";
+    if (!tr || !tr.getCapabilities) return;
+    let cap = {};
+    try {
+      cap = tr.getCapabilities() || {};
+    } catch (e) {
+    }
+    const adv = (o) => tr.applyConstraints({ advanced: [o] }).catch((e) => console.warn("constraint", e));
+    if (cap.focusMode && cap.focusMode.indexOf("continuous") >= 0) adv({ focusMode: "continuous" });
+    if (cap.zoom && cap.zoom.max > 1) {
+      const maxZ = cap.zoom.max;
+      const steps = [1, Math.min(2, maxZ)];
+      if (maxZ >= 3) steps.push(Math.min(3, maxZ));
+      let zi = 0;
+      zb.textContent = "\u{1F50D} 1x";
+      zb.style.display = "inline-block";
+      zb.onclick = () => {
+        zi = (zi + 1) % steps.length;
+        adv({ zoom: steps[zi] });
+        zb.textContent = "\u{1F50D} " + steps[zi] + "x";
+      };
+    }
+    if (cap.torch) {
+      let on = false;
+      tb.style.display = "inline-block";
+      tb.style.background = "rgba(255,255,255,.1)";
+      tb.onclick = () => {
+        on = !on;
+        adv({ torch: on });
+        tb.style.background = on ? "rgba(250,204,21,.4)" : "rgba(255,255,255,.1)";
+      };
+    }
+    vid.onclick = (ev) => {
+      const t = bcTrack();
+      if (!t || !t.getCapabilities) return;
+      let c = {};
+      try {
+        c = t.getCapabilities() || {};
+      } catch (e) {
+      }
+      if (!c.focusMode) return;
+      const r = vid.getBoundingClientRect();
+      const o = { focusMode: c.focusMode.indexOf("single-shot") >= 0 ? "single-shot" : "continuous" };
+      if (c.focusMode.indexOf("manual") < 0 || true) o.pointsOfInterest = [{ x: Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height)) }];
+      t.applyConstraints({ advanced: [o] }).catch(() => t.applyConstraints({ advanced: [{ focusMode: o.focusMode }] }).catch(() => {
+      }));
+      setTimeout(() => {
+        if (c.focusMode.indexOf("continuous") >= 0) t.applyConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {
+        });
+      }, 1500);
+    };
+  }
+  function bindBcManual() {
+    const mi = document.getElementById("bcManualInput2");
+    const go = () => {
+      const v = mi.value.trim();
+      if (!v) return;
+      mi.value = "";
+      processBcCode(v);
+    };
+    document.getElementById("bcManualBtn2").onclick = go;
+    mi.onkeydown = (e) => {
+      if (e.key === "Enter") go();
+    };
+    }
   async function stopBcScanner() {
     if (bcScanner && bcRunning) {
       try {
