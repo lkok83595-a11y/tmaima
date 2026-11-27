@@ -3492,9 +3492,9 @@ tbody tr:last-child td{border-bottom:none}
 .mb-qr{width:92px;height:92px;background:#fff}.mb-qr svg{shape-rendering:crispEdges}
 .mb-codes{display:flex;align-items:center;gap:10px;flex:1}
 .mb-codes .prm-bc-wrap{max-width:200px}
-.mb-sig{text-align:right;font-size:12px;min-width:120px}
-.mb-sig-l{font-size:11px;margin-top:3px}.mb-tag{text-align:center;font-size:12px;margin:14px 14px 0;color:#333}.mb-wm{position:absolute;left:50%;top:48%;width:200px;height:150px;transform:translate(-50%,-50%);opacity:.08;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain}
-.mb-sigline{border-bottom:1px solid #555;height:26px;margin-top:4px}
+.mb-sig{text-align:right;font-size:13px;font-weight:700;width:180px;min-width:150px;margin:0 0 4px 0;flex-shrink:0}
+.mb-sig-l{font-size:11px;font-weight:600;color:#444;margin-top:5px}.mb-tag{text-align:center;font-size:12px;margin:14px 14px 0;color:#333}.mb-wm{position:absolute;left:50%;top:48%;width:200px;height:150px;transform:translate(-50%,-50%);opacity:.08;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain}
+.mb-sigline{border-bottom:1.2px solid #444;height:4px;margin-top:2px}
 @media (max-width:520px){.mb-co{gap:8px}.mb-logo{width:56px;height:46px}.mb-coname{font-size:17px}.mb-cocontact{max-width:100%;text-align:left}.mb-tbl{font-size:10.5px}}
 
 
@@ -8563,7 +8563,7 @@ img,video,canvas,svg{max-width:100%}
         <div class="mb-codes" id="prmQrNotes">
           
         </div>
-        <div class="mb-sig"><div id="prmSigName" dir="auto">Tmima Shoes</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div>
+        <div class="mb-sig"><div id="prmSigName" dir="auto">Tmima Shoes</div><div class="mb-sigline"></div><div class="mb-sig-l" dir="rtl">توقيع المسؤول</div></div>
       </div>
       <div class="mb-tag" id="prmTag" dir="auto"></div>
       <div class="mb-wm" id="prmWm"></div>
@@ -27336,7 +27336,7 @@ ${/ربح|ارباح|مكسب|كسب|profit/.test(s) ? "\u0627\u0644\u0631\u0628
         <div class="mb-sum-r mb-paidline"><span>Amount Paid</span><span>${nf(paid)}</span></div><div class="mb-sum-r mb-paidline"><span>Balance</span><span>${nf(rest)}</span></div>
       </div>
       <div class="mb-rem"><div class="mb-rem-h">Remarks</div><div class="mb-rem-t" dir="auto">${esc3(policy)}</div>${notes ? `<div class="mb-rem-t" dir="auto">${esc3(notes)}</div>` : ""}</div>
-      <div class="mb-bottom"><div class="mb-codes"></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l">Authorized Signatory</div></div></div>
+      <div class="mb-bottom"><div class="mb-codes"></div><div class="mb-sig"><div dir="auto">${esc3(s.sigName || "Tmima Shoes")}</div><div class="mb-sigline"></div><div class="mb-sig-l" dir="rtl">توقيع المسؤول</div></div></div>
       <div class="mb-tag" dir="auto">${esc3((s.invNote || "").trim() || "\u{1F91D} \u062A\u0645\u064A\u0645\u0629 \u0634\u0648\u0632 \u0627\u062E\u062A\u064A\u0627\u0631\u0643 \u0627\u0644\u0623\u0641\u0636\u0644")}</div>
       <div class="mb-wm" style="background-image:${s.logoData ? `url('${s.logoData}')` : "none"}"></div>${grand > 0 && rest <= 0.004 ? `<div class="mb-stamp">PAID</div>` : ""}`;
   }
