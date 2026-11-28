@@ -169,7 +169,7 @@ function doShare(){
 }
 function close_(){$("lb").classList.remove("on");document.body.style.overflow=""}
 var tt,EM=["😍","🔥","🏃","⏳","🛒","💸","👟","🤩","😎","🫶","🚚","💎","🎁","👑","🤝"],ei=0;
-function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},5000)}
+function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2000)}
 function pop(el){var r=el.getBoundingClientRect(),d=document.createElement("div");d.className="pop";d.textContent=EM[ei++%EM.length];
  var cx=r.left+r.width/2,cy=Math.min(r.top+r.height/2,innerHeight-120);d.style.left=cx+"px";d.style.top=Math.max(cy,90)+"px";document.body.appendChild(d);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},950)}
 var K=1,IDLE=["خد وقتك يا فندم، احنا معاك 🤝","محتار؟ ابعتلنا على واتساب ونساعدك تختار 😊","مش لوحدك، احنا هنا 🫶","كل الحاجات حلوة، بس اللي هيعجبك هيعجبك 😉"],ii=0;
