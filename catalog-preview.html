@@ -61,8 +61,10 @@ footer{text-align:center;color:var(--faint);font-size:12px;padding:10px 0 28px}
 @keyframes salute{0%{transform:rotate(0)}30%{transform:rotate(-16deg) translateY(-6px)}55%{transform:rotate(6deg)}100%{transform:rotate(0)}}
 @keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.welcome .em,.welcome .tx{animation:none}}
+.toast{position:fixed;left:50%;top:64px;width:max-content;transform:translate(-50%,-12px);z-index:200;background:#1f2a2b;color:#fff;border-radius:16px;padding:13px 20px;font:600 15px var(--font),'Noto Color Emoji',sans-serif;max-width:90vw;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&text=%F0%9F%AB%A1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&text=%F0%9F%AB%A1%F0%9F%98%8D&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="welcome" id="welcome"><div class="em">🫡</div><div class="tx">أهلا بيك يا فندم<br>في تميمة شوز</div></div>
@@ -70,6 +72,7 @@ footer{text-align:center;color:var(--faint);font-size:12px;padding:10px 0 28px}
 <div class="bar"><input class="search" id="q" type="search" placeholder="ابحث بالاسم أو الكود..." autocomplete="off"><div class="chips" id="chips"></div></div>
 <main><div class="grid" id="grid"></div><div class="msg" id="msg">جاري التحميل...</div></main>
 <footer id="foot"></footer>
+<div class="toast" id="toast"></div>
 <div class="lb" id="lb"><div class="sheet" id="sheet"></div></div>
 <script>
 (function(){
@@ -163,7 +166,9 @@ function doShare(){
  }
 }
 function close_(){$("lb").classList.remove("on");document.body.style.overflow=""}
-$("grid").addEventListener("click",function(e){if(e.target.closest(".order"))return;var c=e.target.closest(".card");if(!c)return;var p=shown[+c.getAttribute("data-i")];if(p)open_(p)});
+var tt;function toast(){var t=$("toast");t.textContent="جيت لحد هنا؟ يبقى أنا عجبتك 😍";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2800)}
+$("sheet").addEventListener("click",function(e){if(e.target.classList.contains("big"))toast()});
+$("grid").addEventListener("click",function(e){if(e.target.closest(".ph"))toast();if(e.target.closest(".order"))return;var c=e.target.closest(".card");if(!c)return;var p=shown[+c.getAttribute("data-i")];if(p)open_(p)});
 $("sheet").addEventListener("click",function(e){if(e.target.id==="shareImg")doShare()});
 $("lb").addEventListener("click",function(e){if(e.target.id==="lb"||e.target.closest(".x"))close_()});
 load().then(function(d){
