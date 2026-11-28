@@ -78,7 +78,7 @@ function load(){
  }).catch(function(){
   /* PREVIEW FALLBACK (removed once the read-only function is approved): safe columns only */
   return Promise.all([
-   fetch(URL_+"products?archived_at=is.null&select=id,code,name,category,sell_price,image&order=code.asc",{headers:H}).then(function(r){return r.json()}),
+   fetch(URL_+"products?archived_at=is.null&qty=gt.0&select=id,code,name,category,sell_price,image&order=code.asc",{headers:H}).then(function(r){return r.json()}),
    fetch(URL_+"shop_settings?id=eq.1&select=data",{headers:H}).then(function(r){return r.json()})
   ]).then(function(a){var d=(a[1][0]&&a[1][0].data)||{};return{shop:{name:d.nameAr||"",phone:d.phone1||""},products:a[0]}});
  });
